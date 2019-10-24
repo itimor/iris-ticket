@@ -1,8 +1,8 @@
 package models
 
 import (
+	"iris-ticket/backend/config"
 	"iris-ticket/backend/database"
-
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -197,12 +197,14 @@ func CheckLogin(username, password string) (response Token, status bool, msg str
 		return
 	} else {
 		if ok := bcrypt.Match(password, user.Password); ok {
+			expireTime := time.Now().Add(time.Hour * time.Duration(config.Conf.Get("jwt.timeout").(int64))).Unix()
+			jwtSecret := config.Conf.Get("jwt.secert").(string)
 			token := jwt.New(jwt.SigningMethodHS256)
 			claims := make(jwt.MapClaims)
-			claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix()
+			claims["exp"] = expireTime
 			claims["iat"] = time.Now().Unix()
 			token.Claims = claims
-			tokenString, err := token.SignedString([]byte("secret"))
+			Tokenstring, err := token.SignedString([]byte(jwtSecret))
 
 			if err != nil {
 				msg = err.Error()
@@ -210,13 +212,12 @@ func CheckLogin(username, password string) (response Token, status bool, msg str
 			}
 
 			oauthToken := new(OauthToken)
-			oauthToken.Token = tokenString
+			oauthToken.Token = Tokenstring
 			oauthToken.UserId = user.ID
-			oauthToken.Secret = "secret"
+			oauthToken.Secret = jwtSecret
 			oauthToken.Revoked = false
-			oauthToken.ExpressIn = time.Now().Add(time.Hour * time.Duration(1)).Unix()
+			oauthToken.ExpressIn = expireTime
 			oauthToken.CreatedAt = time.Now()
-
 			response = oauthToken.OauthTokenCreate()
 			status = true
 			msg = "success"

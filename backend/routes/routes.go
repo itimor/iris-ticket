@@ -3,6 +3,7 @@ package routes
 import (
 	"iris-ticket/backend/controllers"
 	"iris-ticket/backend/middleware"
+	"iris-ticket/backend/middleware/jwts"
 
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
@@ -21,19 +22,18 @@ func Register(api *iris.Application) {
 
 	main := api.Party("/", crs).AllowMethods(iris.MethodOptions)
 
-	home := main.Party("/")
-	home.Get("/", func(ctx iris.Context) { // 首页模块
+	main.Get("/", func(ctx iris.Context) { // 首页模块
 		//_ = ctx.View("index.html")
 		ctx.HTML("<h1 style='height: 1000px;line-height: 1000px;text-align: center;'>召唤师，欢迎来到王者峡谷</h1>")
 	})
 
 	v1 := api.Party("/v1", crs).AllowMethods(iris.MethodOptions)
+	v1.Use(jwts.JwtHandler().Serve, middleware.AuthToken)
 	{
-		v1.Post("/api/auth/login", controllers.UserLogin)
 		v1.PartyFunc("/api", func(admin router.Party) {
-			admin.Use(middleware.JwtHandler().Serve, middleware.AuthToken)
-
+			// admin.Use(jwts.JwtHandler().Serve, middleware.AuthToken)
 			admin.PartyFunc("/auth", func(users router.Party) {
+				admin.Post("/api/auth/login", controllers.UserLogin)
 				admin.Get("/logout", controllers.UserLogout)
 				admin.Patch("/changePasswd/{id:uint}", controllers.UpdateUserPassword)
 			})

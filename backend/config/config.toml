@@ -2,9 +2,12 @@
 name = 'gogobar'
 apidoc = './apidoc'
 apiurl = 'http://localhost:8000'
-ignore_urls = ["/", "/home", "/user/login", "/user/registe"]
-jwt_timeout = 7   # token 过期天数
-jwt_prefix = "Bearer"   # token 前缀
+ignore_urls = ["/", "/apidoc", "/user/login", "/user/registe", "api/users"]
+
+[jwt]
+timeout = 3   # token 过期时间，hour
+prefix = "Bearer"   # token 前缀
+secert = "xxoo-1234-xxoo"   # token 前缀
 
 [test]
 loglevel = 'info'
