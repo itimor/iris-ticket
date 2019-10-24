@@ -7,11 +7,27 @@ import (
 
 	"iris-ticket/backend/config"
 	"iris-ticket/backend/controllers"
+	"iris-ticket/backend/middleware/jwts"
 	"iris-ticket/backend/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris"
 )
+
+func ServeHTTP(ctx iris.Context) {
+	path := ctx.Path()
+	// 过滤静态资源、login接口、首页等...不需要验证
+	if checkURL(path) || strings.Contains(path, "/statics") {
+		ctx.Next()
+		return
+	}
+
+	// jwt
+	jwts.JwtHandler()
+
+	// auth
+	AuthToken(ctx)
+}
 
 /**
  * 判断 token 是否有效
@@ -20,13 +36,6 @@ import (
  * @param  {[type]}  ctx       iris.Context    [description]
  */
 func AuthToken(ctx iris.Context) {
-	path := ctx.Path()
-	// 过滤静态资源、login接口、首页等...不需要验证
-	if checkURL(path) || strings.Contains(path, "/statics") {
-		ctx.Next()
-		return
-	}
-
 	u := ctx.Values().Get("xxoo-jwts").(*jwt.Token) //获取 token 信息
 	token := models.GetOauthTokenByToken(u.Raw)     //获取 access_token 信息
 	if token.Revoked || token.ExpressIn < time.Now().Unix() {

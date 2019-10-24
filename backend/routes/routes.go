@@ -3,7 +3,6 @@ package routes
 import (
 	"iris-ticket/backend/controllers"
 	"iris-ticket/backend/middleware"
-	"iris-ticket/backend/middleware/jwts"
 
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
@@ -28,7 +27,7 @@ func Register(api *iris.Application) {
 	})
 
 	v1 := api.Party("/v1", crs).AllowMethods(iris.MethodOptions)
-	v1.Use(jwts.JwtHandler().Serve, middleware.AuthToken)
+	v1.Use(middleware.ServeHTTP)
 	{
 		v1.PartyFunc("/api", func(admin router.Party) {
 			// admin.Use(jwts.JwtHandler().Serve, middleware.AuthToken)
