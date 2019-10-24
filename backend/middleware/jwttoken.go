@@ -23,10 +23,29 @@ func ServeHTTP(ctx iris.Context) {
 	}
 
 	// jwt
-	jwts.JwtHandler()
+	jj := JwtHandler().Get
+
+	fmt.Printf("%v", jj)
 
 	// auth
-	AuthToken(ctx)
+	if jj != nil {
+		AuthToken(ctx)
+	}
+}
+
+/**
+ * 验证 jwt
+ * @method JwtHandler
+ */
+func JwtHandler() *jwts.Middleware {
+	jwtSecert := config.Conf.Get("jwt.secert").(string)
+	return jwts.New(jwts.Config{
+		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+			return []byte(jwtSecert), nil
+		},
+		ContextKey:    jwtSecert,
+		SigningMethod: jwt.SigningMethodHS256,
+	})
 }
 
 /**
@@ -36,14 +55,21 @@ func ServeHTTP(ctx iris.Context) {
  * @param  {[type]}  ctx       iris.Context    [description]
  */
 func AuthToken(ctx iris.Context) {
-	u := ctx.Values().Get("xxoo-jwts").(*jwt.Token) //获取 token 信息
-	token := models.GetOauthTokenByToken(u.Raw)     //获取 access_token 信息
-	if token.Revoked || token.ExpressIn < time.Now().Unix() {
-		// ctx.StatusCode(http.StatusUnauthorized)
-		ctx.JSON(controllers.ApiJson{Status: false, Data: "", Msg: "Token has expired"})
+	u := ctx.Values().Get(config.Conf.Get("jwt.secert").(string)) //获取 token 信息
+	if u == nil {
+		ctx.StatusCode(iris.StatusBadRequest)
+		_, _ = ctx.JSON(controllers.ApiResource(false, "Please take a token request", "error"))
 		return
 	} else {
-		ctx.Values().Set("auth_user_id", token.UserId)
+		k := u.(*jwt.Token)
+		token := models.GetOauthTokenByToken(k.Raw) //获取 access_token 信息
+		if token.Revoked || token.ExpressIn < time.Now().Unix() {
+			// ctx.StatusCode(http.StatusUnauthorized)
+			ctx.JSON(controllers.ApiJson{Status: false, Data: "", Msg: "Token has expired"})
+			return
+		} else {
+			ctx.Values().Set("auth_user_id", token.UserId)
+		}
 	}
 
 	ctx.Next() // execute the "after" handler registered via `DoneGlobal`.
@@ -57,7 +83,6 @@ return
 func checkURL(reqPath string) bool {
 	//config := iris.YAML("conf/app.yml")
 	ignoreURLs := config.Conf.Get("server.ignore_urls").([]interface{})
-	fmt.Println(ignoreURLs)
 	for _, v := range ignoreURLs {
 		if reqPath == v {
 			return true
