@@ -3,11 +3,12 @@ package models
 import (
 	"iris-ticket/backend/database"
 
+	"github.com/jinzhu/gorm"
 	"github.com/kataras/golog"
 )
 
 type UserGroup struct {
-	ID          uint   `gorm:"primary_key"`
+	gorm.Model
 	Name        string `gorm:"unique;not null VARCHAR(191)"`
 	DisplayName string `gorm:"VARCHAR(191)"`
 	Desc        string `gorm:"VARCHAR(191)"`

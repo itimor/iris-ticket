@@ -105,19 +105,16 @@ func New(cfg ...Config) *Middleware {
 }
 
 func logf(ctx iris.Context, format string, args ...interface{}) {
-	fmt.Println("logf")
 	ctx.Application().Logger().Debugf(format, args...)
 }
 
 // Get returns the user (&token) information for this client/request
 func (m *Middleware) Get(ctx context.Context) *jwt.Token {
-	fmt.Println("Get")
 	return ctx.Values().Get(m.Config.ContextKey).(*jwt.Token)
 }
 
 // Serve the middleware's action
 func (m *Middleware) Serve(ctx context.Context) {
-	fmt.Println("Serve")
 	if err := m.CheckJWT(ctx); err != nil {
 		m.Config.ErrorHandler(ctx, err)
 		return
@@ -186,7 +183,6 @@ var jwtParser = new(jwt.Parser)
 
 // CheckJWT the main functionality, checks for token
 func (m *Middleware) CheckJWT(ctx context.Context) error {
-	fmt.Println("CheckJWT")
 
 	if !m.Config.EnableAuthOnOptions {
 		if ctx.Method() == iris.MethodOptions {
@@ -254,7 +250,6 @@ func (m *Middleware) CheckJWT(ctx context.Context) error {
 
 	logf(ctx, "JWT: %v", parsedToken)
 
-	fmt.Println(m.Config.ContextKey)
 	// If we get here, everything worked and we can set the
 	// user property in context.
 	ctx.Values().Set(m.Config.ContextKey, parsedToken)

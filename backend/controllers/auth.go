@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"iris-ticket/backend/models"
@@ -84,7 +83,6 @@ func UserLogout(ctx iris.Context) {
 	// models.DeleteRequestTokenByToken(token)
 
 	aui, _ := ctx.Values().GetUint("auth_user_id")
-	fmt.Println(aui)
 	models.UserAdminLogout(aui)
 
 	ctx.StatusCode(http.StatusOK)

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -23,14 +22,10 @@ func ServeHTTP(ctx iris.Context) {
 	}
 
 	// jwt
-	jj := JwtHandler().Get
-
-	fmt.Printf("%v", jj)
+	JwtHandler().Serve(ctx)
 
 	// auth
-	if jj != nil {
-		AuthToken(ctx)
-	}
+	AuthToken(ctx)
 }
 
 /**
@@ -55,21 +50,14 @@ func JwtHandler() *jwts.Middleware {
  * @param  {[type]}  ctx       iris.Context    [description]
  */
 func AuthToken(ctx iris.Context) {
-	u := ctx.Values().Get(config.Conf.Get("jwt.secert").(string)) //获取 token 信息
-	if u == nil {
-		ctx.StatusCode(iris.StatusBadRequest)
-		_, _ = ctx.JSON(controllers.ApiResource(false, "Please take a token request", "error"))
+	u := ctx.Values().Get(config.Conf.Get("jwt.secert").(string)).(*jwt.Token) //获取 token 信息
+	token := models.GetOauthTokenByToken(u.Raw)                                //获取 access_token 信息
+	if token.Revoked || token.ExpressIn < time.Now().Unix() {
+		// ctx.StatusCode(http.StatusUnauthorized)
+		ctx.JSON(controllers.ApiJson{Status: false, Data: "", Msg: "Token has expired"})
 		return
 	} else {
-		k := u.(*jwt.Token)
-		token := models.GetOauthTokenByToken(k.Raw) //获取 access_token 信息
-		if token.Revoked || token.ExpressIn < time.Now().Unix() {
-			// ctx.StatusCode(http.StatusUnauthorized)
-			ctx.JSON(controllers.ApiJson{Status: false, Data: "", Msg: "Token has expired"})
-			return
-		} else {
-			ctx.Values().Set("auth_user_id", token.UserId)
-		}
+		ctx.Values().Set("auth_user_id", token.UserId)
 	}
 
 	ctx.Next() // execute the "after" handler registered via `DoneGlobal`.
