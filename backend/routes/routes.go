@@ -1,12 +1,10 @@
 package routes
 
 import (
-	"iris-ticket/backend/controllers"
-	"iris-ticket/backend/middleware"
+	sys "iris-ticket/backend/app/controllers/sys"
 
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/core/router"
 )
 
 func Register(api *iris.Application) {
@@ -27,31 +25,34 @@ func Register(api *iris.Application) {
 	})
 
 	v1 := api.Party("/v1", crs).AllowMethods(iris.MethodOptions)
-	v1.Use(middleware.ServeHTTP)
+	//v1.Use(middleware.ServeHTTP)
 	// v1.Use(middleware.ServeHTTP, middleware.JwtHandler().Serve, middleware.AuthToken)
 
 	{
-		v1.PartyFunc("/api", func(admin router.Party) {
-			admin.PartyFunc("/auth", func(auth router.Party) {
-				auth.Post("/login", controllers.UserLogin)
-				auth.Get("/logout", controllers.UserLogout)
-				auth.Patch("/changePasswd/{id:uint}", controllers.UpdateUserPassword)
-			})
-			admin.PartyFunc("/users", func(users router.Party) {
-				users.Get("/", controllers.GetAllUsers)
-				users.Get("/{id:uint}", controllers.GetUser)
-				users.Post("/", controllers.CreateUser)
-				users.Put("/{id:uint}", controllers.UpdateUser)
-				users.Delete("/{id:uint}", controllers.DeleteUser)
-				users.Get("/profile", controllers.GetProfile)
-			})
-			admin.PartyFunc("/roles", func(roles router.Party) {
-				roles.Get("/", controllers.GetAllRoles)
-				roles.Get("/{id:uint}", controllers.GetRole)
-				roles.Post("/", controllers.CreateRole)
-				roles.Put("/{id:uint}", controllers.UpdateRole)
-				roles.Delete("/{id:uint}", controllers.DeleteRole)
-			})
-		})
+		users := sys.User{}
+		v1.Get("/{id:uint}", users.List)
+
+		// v1.PartyFunc("/api", func(admin router.Party) {
+		// 	admin.PartyFunc("/auth", func(auth router.Party) {
+		// 		auth.Post("/login", controllers.UserLogin)
+		// 		auth.Get("/logout", controllers.UserLogout)
+		// 		auth.Patch("/changePasswd/{id:uint}", controllers.UpdateUserPassword)
+		// 	})
+		// 	admin.PartyFunc("/users", func(users router.Party) {
+		// 		users.Get("/", controllers.GetAllUsers)
+		// 		users.Get("/{id:uint}", controllers.GetUser)
+		// 		users.Post("/", controllers.CreateUser)
+		// 		users.Put("/{id:uint}", controllers.UpdateUser)
+		// 		users.Delete("/{id:uint}", controllers.DeleteUser)
+		// 		users.Get("/profile", controllers.GetProfile)
+		// 	})
+		// 	admin.PartyFunc("/roles", func(roles router.Party) {
+		// 		roles.Get("/", controllers.GetAllRoles)
+		// 		roles.Get("/{id:uint}", controllers.GetRole)
+		// 		roles.Post("/", controllers.CreateRole)
+		// 		roles.Put("/{id:uint}", controllers.UpdateRole)
+		// 		roles.Delete("/{id:uint}", controllers.DeleteRole)
+		// 	})
+		// })
 	}
 }
