@@ -12,7 +12,7 @@ import (
 // 后台用户
 type User struct {
 	basemodel.Model
-	UserName string `gorm:"column:username;size:32;unique_index:uk_user_username;not null;" json:"username" form:"username"` // 用户名
+	Username string `gorm:"column:username;size:32;unique_index:uk_user_username;not null;" json:"username" form:"username"` // 用户名
 	RealName string `gorm:"column:realname;size:32;" json:"realname" form:"realname"`                                        // 真实姓名
 	Password string `gorm:"column:password;type:char(32);not null;" json:"password" form:"password"`                         // 密码(sha1(md5(明文))加密)
 	Email    string `gorm:"column:email;size:64;" json:"email" form:"email"`                                                 // 邮箱

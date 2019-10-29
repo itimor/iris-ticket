@@ -1,10 +1,16 @@
-package controllers
+package sys
 
 import (
+	"fmt"
+	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
-	models "iris-ticket/backend/app/models/common"
+	"iris-ticket/backend/app/models/db"
 	"iris-ticket/backend/app/models/sys"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
+	"github.com/jameskeane/bcrypt"
+	"github.com/kataras/golog"
 	"github.com/kataras/iris"
 )
 
@@ -18,15 +24,98 @@ func (Auth) Login(ctx iris.Context) {
 		common.ResErrSrv(ctx, err)
 		return
 	} else {
-		if UserNameErr := common.Validate.Var(aul.UserName, "required,min=4,max=20"); UserNameErr != nil {
+		if UserNameErr := common.Validate.Var(aul.Username, "required,min=4,max=20"); UserNameErr != nil {
 			common.ResFail(ctx, "username format err")
 			return
 		} else if PwdErr := common.Validate.Var(aul.Password, "required,min=5,max=20"); PwdErr != nil {
 			common.ResFail(ctx, "password format err")
 		} else {
 			ctx.StatusCode(iris.StatusOK)
-			response, status, msg := models.CheckLogin(aul.Username, aul.Password)
-			_, _ = ctx.JSON(ApiResource(status, response, msg))
+			_, _, msg := CheckLogin(aul.Username, aul.Password)
+			common.ResSuccess(ctx, msg)
+		}
+	}
+}
+
+// 用户登出
+func (Auth) Logout(ctx iris.Context) {
+	// 删除uid
+	uid, _ := ctx.Values().GetUint("auth_user_id")
+	UserAdminLogout(uid)
+
+	common.ResSuccessMsg(ctx)
+}
+
+/**
+ * 校验用户登录
+ * @method UserAdminCheckLogin
+ * @param  {[type]}  username string [description]
+ */
+func UserAdminCheckLogin(username string) sys.User {
+	aul := sys.User{}
+	if err := db.DB.Where("username = ?", username).First(&aul).Error; err != nil {
+		golog.Error("UserAdminCheckLoginErr ", err)
+	}
+	return aul
+}
+
+/**
+* 用户退出登陆
+* @method UserAdminLogout
+* @param  {[type]} ids string [description]
+ */
+func UserAdminLogout(uid uint) string {
+	ot := sys.UpdateOauthTokenByUserId(uid)
+	return ot.Secret
+}
+
+/**
+ * 判断用户是否登录
+ * @method CheckLogin
+ * @param  {[type]}  username string    [description]
+ * @param  {[type]}  password string [description]
+ */
+func CheckLogin(username, password string) (response sys.Token, status bool, msg string) {
+	user := UserAdminCheckLogin(username)
+	if user.ID == 0 {
+		msg = "user is not exist"
+		return
+	} else {
+		salt, _ := bcrypt.Salt(10)
+		hash, _ := bcrypt.Hash(password, salt)
+		ok := bcrypt.Match(password, user.Password)
+		fmt.Println(password)
+		fmt.Println(hash)
+		if ok {
+			expireTime := time.Now().Add(time.Hour * time.Duration(config.Conf.Get("jwt.timeout").(int64))).Unix()
+			jwtSecret := config.Conf.Get("jwt.secert").(string)
+			token := jwt.New(jwt.SigningMethodHS256)
+			claims := make(jwt.MapClaims)
+			claims["exp"] = expireTime
+			claims["iat"] = time.Now().Unix()
+			token.Claims = claims
+			Tokenstring, err := token.SignedString([]byte(jwtSecret))
+
+			if err != nil {
+				msg = err.Error()
+				return
+			}
+
+			oauthToken := new(sys.OauthToken)
+			oauthToken.Token = Tokenstring
+			oauthToken.UserId = user.ID
+			oauthToken.Secret = jwtSecret
+			oauthToken.Revoked = false
+			oauthToken.ExpressIn = expireTime
+			oauthToken.CreatedAt = time.Now()
+			response = oauthToken.OauthTokenCreate()
+			status = true
+			msg = "success"
+
+			return
+		} else {
+			msg = "password is error"
+			return
 		}
 	}
 }

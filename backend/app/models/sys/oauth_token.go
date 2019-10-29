@@ -1,15 +1,17 @@
-package models
+package sys
 
 import (
-	"github.com/kataras/golog"
+    "iris-ticket/backend/app/models/basemodel"
+	"iris-ticket/backend/app/models/db"
 
-	"iris-ticket/backend/database"
-
+    "time"
+	
+    "github.com/kataras/golog"
 	"github.com/jinzhu/gorm"
 )
 
 type OauthToken struct {
-	gorm.Model
+	basemodel.Model
 	Token     string `gorm:"not null default '' comment('Token') VARCHAR(191)"`
 	UserId    uint64 `gorm:"not null default '' comment('UserId') VARCHAR(191)"`
 	Secret    string `gorm:"not null default '' comment('Secret') VARCHAR(191)"`
@@ -21,12 +23,49 @@ type Token struct {
 	Token string `json:"access_token"`
 }
 
+// 表名
+func (OauthToken) TableName() string {
+	return TableName("oauth_token")
+}
+
+// 添加前
+func (m *OauthToken) BeforeCreate(scope *gorm.Scope) error {
+	m.CreatedAt = time.Now()
+	m.UpdatedAt = time.Now()
+	return nil
+}
+
+// 更新前
+func (m *OauthToken) BeforeUpdate(scope *gorm.Scope) error {
+	m.UpdatedAt = time.Now()
+	return nil
+}
+
+// 删除角色及关联数据
+func (OauthToken) Delete(roleids []uint64) error {
+	tx := db.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := tx.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Where("id in (?)", roleids).Delete(&OauthToken{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
+}
+
 /**
  * oauth_token
  * @method OauthTokenCreate
  */
 func (ot *OauthToken) OauthTokenCreate() (response Token) {
-	database.DB.Create(ot)
+	db.DB.Create(ot)
 	response = Token{ot.Token}
 
 	return
@@ -39,7 +78,7 @@ func (ot *OauthToken) OauthTokenCreate() (response Token) {
  */
 func GetOauthTokenByToken(token string) (ot *OauthToken) {
 	ot = new(OauthToken)
-	database.DB.Where("token =  ?", token).First(&ot)
+	db.DB.Where("token =  ?", token).First(&ot)
 	return
 }
 
@@ -50,7 +89,7 @@ func GetOauthTokenByToken(token string) (ot *OauthToken) {
  */
 func UpdateOauthTokenByUserId(userId uint) (ot *OauthToken) {
 	ot = new(OauthToken)
-	database.DB.Model(ot).Where("revoked = ?", false).Where("user_id = ?", userId).Updates(map[string]interface{}{"revoked": true})
+	db.DB.Model(ot).Where("revoked = ?", false).Where("user_id = ?", userId).Updates(map[string]interface{}{"revoked": true})
 
 	return
 }
@@ -59,7 +98,7 @@ func UpdateOauthTokenByUserId(userId uint) (ot *OauthToken) {
  * 删除token
  */
 func DeleteRequestTokenByToken(token *OauthToken) (err error) {
-	if err := database.DB.Delete(token).Error; err != nil {
+	if err := db.DB.Delete(token).Error; err != nil {
 		golog.Error("DeleteRequestTokenByTokenErr: ", err)
 	}
 	return

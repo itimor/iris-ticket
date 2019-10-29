@@ -1,4 +1,4 @@
-package controllers
+package sys
 
 import (
 	"iris-ticket/backend/app/controllers/common"
@@ -83,7 +83,7 @@ func (User) Update(ctx iris.Context) {
 		common.ResErrSrv(ctx, err)
 		return
 	}
-	model.UserName = modelOld.UserName
+	model.Username = modelOld.Username
 	model.Password = modelOld.Password
 	err = models.Save(&model)
 	if err != nil {

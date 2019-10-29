@@ -32,6 +32,11 @@ func Register(app *iris.Application) {
 	//api.Use(middleware.ServeHTTP)
 
 	{
+		auths := sys.Auth{}
+		api.PartyFunc("/auth", func(auth router.Party) {
+			auth.Post("/login", auths.Login)
+			auth.Post("/logout", auths.Logout)
+		})
 		users := sys.User{}
 		api.PartyFunc("/user", func(user router.Party) {
 			user.Get("/detail", users.Detail)
