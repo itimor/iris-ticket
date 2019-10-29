@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"strings"
-	"time"
-
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
 	"iris-ticket/backend/app/middleware/jwts"
 	"iris-ticket/backend/app/models/sys"
+
+	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris"
@@ -51,7 +51,7 @@ func JwtHandler() *jwts.Middleware {
  */
 func AuthToken(ctx iris.Context) {
 	u := ctx.Values().Get(config.Conf.Get("jwt.secert").(string)).(*jwt.Token) //获取 token 信息
-	token := sys.GetOauthTokenByToken(u.Raw)                                //获取 access_token 信息
+	token := sys.GetOauthTokenByToken(u.Raw)                                   //获取 access_token 信息
 	if token.Revoked || token.ExpressIn < time.Now().Unix() {
 		common.ResFail(ctx, "Token has expired")
 		return

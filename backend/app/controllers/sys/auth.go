@@ -42,8 +42,7 @@ func (Auth) Logout(ctx iris.Context) {
 	// 删除uid
 	uid, _ := ctx.Values().GetUint("auth_user_id")
 	UserAdminLogout(uid)
-
-	common.ResSuccessMsg(ctx)
+	common.ResSuccess(ctx, uid)
 }
 
 /**

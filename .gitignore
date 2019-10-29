@@ -4,4 +4,4 @@ go.sum
 *.tmp
 .idea/
 apidoc/
-*.exe
+*.exe*
