@@ -5,7 +5,6 @@ import (
 
 	"iris-ticket/backend/app/models/basemodel"
 	"iris-ticket/backend/app/models/db"
-	"iris-ticket/backend/database"
 
 	"github.com/jinzhu/gorm"
 	"github.com/kataras/golog"
@@ -68,7 +67,7 @@ func GetUserById(id uint64) (user *User, err error) {
 	user = new(User)
 	user.ID = id
 
-	if err = database.DB.First(user).Error; err != nil {
+	if err = db.DB.First(user).Error; err != nil {
 		golog.Error("GetUserByIdErr ", err)
 	}
 
