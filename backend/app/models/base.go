@@ -36,9 +36,9 @@ func InitDB() {
 }
 
 func Migration() {
-	fmt.Println(db.DB.AutoMigrate(new(sys.Menu)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.User)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.RoleMenu)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.Role)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.UserRole)).Error)
+	fmt.Println("db Menu 初始化：", db.DB.AutoMigrate(new(sys.Menu)).Error)
+	fmt.Println("db User 初始化：", db.DB.AutoMigrate(new(sys.User)).Error)
+	fmt.Println("db RoleMenu 初始化：", db.DB.AutoMigrate(new(sys.RoleMenu)).Error)
+	fmt.Println("db Role 初始化：", db.DB.AutoMigrate(new(sys.Role)).Error)
+	fmt.Println("db UserRole 初始化：", db.DB.AutoMigrate(new(sys.UserRole)).Error)
 }

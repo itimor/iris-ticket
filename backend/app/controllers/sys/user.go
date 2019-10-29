@@ -5,21 +5,52 @@ import (
 	models "iris-ticket/backend/app/models/common"
 	"iris-ticket/backend/app/models/sys"
 
+	"github.com/jameskeane/bcrypt"
 	"github.com/kataras/iris"
 )
 
-type ApiJson struct {
-	Status bool        `json:"status"`
-	Msg    interface{} `json:"msg"`
-	Data   interface{} `json:"data"`
-}
-
-func ApiResource(status bool, objects interface{}, msg string) (apijson *ApiJson) {
-	apijson = &ApiJson{Status: status, Data: objects, Msg: msg}
-	return
-}
-
 type User struct{}
+
+// 分页数据
+func (User) List(ctx iris.Context) {
+	page := common.GetPageIndex(ctx)
+	limit := common.GetPageLimit(ctx)
+	sort := common.GetPageSort(ctx)
+	key := common.GetPageKey(ctx)
+	status := common.GetQueryToUint(ctx, "status")
+	var whereOrder []models.PageWhereOrder
+	order := "ID DESC"
+	if len(sort) >= 2 {
+		orderType := sort[0:1]
+		order = sort[1:len(sort)]
+		if orderType == "+" {
+			order += " ASC"
+		} else {
+			order += " DESC"
+		}
+	}
+	whereOrder = append(whereOrder, models.PageWhereOrder{Order: order})
+	if key != "" {
+		v := "%" + key + "%"
+		var arr []interface{}
+		arr = append(arr, v)
+		arr = append(arr, v)
+		whereOrder = append(whereOrder, models.PageWhereOrder{Where: "user_name like ? or real_name like ?", Value: arr})
+	}
+	if status > 0 {
+		var arr []interface{}
+		arr = append(arr, status)
+		whereOrder = append(whereOrder, models.PageWhereOrder{Where: "status = ?", Value: arr})
+	}
+	var total uint64
+	list := []sys.User{}
+	err := models.GetPage(&sys.User{}, &sys.User{}, &list, page, limit, &total, whereOrder...)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	common.ResSuccessPage(ctx, total, &list)
+}
 
 // 详情
 func (User) Detail(ctx iris.Context) {
@@ -34,4 +65,100 @@ func (User) Detail(ctx iris.Context) {
 	}
 	model.Password = ""
 	common.ResSuccess(ctx, &model)
+}
+
+// 更新
+func (User) Update(ctx iris.Context) {
+	model := sys.User{}
+	err := ctx.ReadJSON(&model)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	where := sys.User{}
+	where.ID = model.ID
+	modelOld := sys.User{}
+	_, err = models.First(&where, &modelOld)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	model.UserName = modelOld.UserName
+	model.Password = modelOld.Password
+	err = models.Save(&model)
+	if err != nil {
+		common.ResFail(ctx, "操作失败")
+		return
+	}
+	common.ResSuccessMsg(ctx)
+}
+
+//新增
+func (User) Create(ctx iris.Context) {
+	model := sys.User{}
+	salt, _ := bcrypt.Salt(10)
+	hash, _ := bcrypt.Hash(model.Password, salt)
+
+	err := ctx.ReadJSON(&model)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	model.Password = string(hash)
+	err = models.Create(&model)
+	if err != nil {
+		common.ResFail(ctx, "操作失败")
+		return
+	}
+	common.ResSuccess(ctx, model)
+}
+
+// 删除数据
+func (User) Delete(ctx iris.Context) {
+	var ids []uint64
+
+	err := ctx.ReadJSON(&ids)
+	if err != nil || len(ids) == 0 {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	user := sys.User{}
+	err = user.Delete(ids)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	common.ResSuccessMsg(ctx)
+}
+
+// 获取用户下的角色ID列表
+func (User) AdminsRoleIDList(ctx iris.Context) {
+	UserID := common.GetQueryToUint64(ctx, "user_id")
+	roleList := []uint64{}
+	where := sys.UserRole{UserID: UserID}
+	err := models.PluckList(&sys.UserRole{}, &where, &roleList, "role_id")
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	common.ResSuccess(ctx, &roleList)
+}
+
+// 分配用户角色权限
+func (User) SetRole(ctx iris.Context) {
+	adminsid := common.GetQueryToUint64(ctx, "adminsid")
+	var roleids []uint64
+	err := ctx.ReadJSON(&roleids)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	ar := sys.UserRole{}
+	err = ar.SetRole(adminsid, roleids)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	// go common.CsbinAddRoleForUser(adminsid)
+	common.ResSuccessMsg(ctx)
 }

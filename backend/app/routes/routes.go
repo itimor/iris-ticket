@@ -5,6 +5,7 @@ import (
 
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
+	"github.com/kataras/iris/core/router"
 )
 
 func Register(app *iris.Application) {
@@ -28,10 +29,20 @@ func Register(app *iris.Application) {
 	app.HandleDir("/apidoc", "../apidoc") // 设置静态资源
 
 	api := app.Party("/api", crs).AllowMethods(iris.MethodOptions)
-	//v1.Use(middleware.ServeHTTP)
+	//api.Use(middleware.ServeHTTP)
 
 	{
 		users := sys.User{}
-		api.Get("/user/detail", users.Detail)
+		api.PartyFunc("/user", func(user router.Party) {
+			user.Get("/detail", users.Detail)
+			user.Get("/list", users.List)
+			user.Get("/detail", users.Detail)
+			user.Get("/adminsroleidlist", users.AdminsRoleIDList)
+			user.Post("/delete", users.Delete)
+			user.Post("/update", users.Update)
+			user.Post("/create", users.Create)
+			user.Post("/setrole", users.SetRole)
+		})
+
 	}
 }
