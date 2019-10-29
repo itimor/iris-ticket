@@ -3,7 +3,7 @@ package main
 import (
 	"iris-ticket/backend/config"
 	"iris-ticket/backend/database"
-	"iris-ticket/backend/app/models"
+	"iris-ticket/backend/models"
 	"iris-ticket/backend/routes"
 
 	"flag"
@@ -24,11 +24,6 @@ func main() {
 	}
 }
 
-func initDB() {
-	models.InitDB()
-	models.Migration()
-}
-
 func newApp() *iris.Application {
 	hostname, _ := os.Hostname()
 	var env string
@@ -39,7 +34,6 @@ func newApp() *iris.Application {
 		env = "test"
 		golog.Info("进入测试环境")
 	}
-	golog.Info(env)
 
 	app := iris.New()
 	loglevle := config.Conf.Get("test.loglevel").(string)
@@ -61,8 +55,12 @@ func newApp() *iris.Application {
 
 	// migrate db
 	golog.Info("初始化数据库")
-    models.InitDB()
-	models.Migration()
+	database.DB.AutoMigrate(
+		&models.User{},
+		&models.UserGroup{},
+		&models.Role{},
+		&models.OauthToken{},
+	)
 
 	iris.RegisterOnInterrupt(func() {
 		_ = database.DB.Close()
@@ -72,7 +70,7 @@ func newApp() *iris.Application {
 	routes.Register(app)
 
 	//初始化系统 账号 权限 角色
-	//models.CreateSystemData(env)
+	models.CreateSystemData(env)
 
 	return app
 }
