@@ -4,7 +4,7 @@ import (
 	"iris-ticket/backend/app/controllers/common"
 	models "iris-ticket/backend/app/models/common"
 	"iris-ticket/backend/app/models/sys"
-
+	
 	"github.com/jameskeane/bcrypt"
 	"github.com/kataras/iris"
 )
@@ -96,14 +96,13 @@ func (User) Update(ctx iris.Context) {
 //新增
 func (User) Create(ctx iris.Context) {
 	model := sys.User{}
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(model.Password, salt)
-
 	err := ctx.ReadJSON(&model)
 	if err != nil {
 		common.ResErrSrv(ctx, err)
 		return
 	}
+	salt, _ := bcrypt.Salt(10)
+	hash, _ := bcrypt.Hash(model.Password, salt)
 	model.Password = string(hash)
 	err = models.Create(&model)
 	if err != nil {

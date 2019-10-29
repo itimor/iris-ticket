@@ -1,11 +1,11 @@
 package sys
 
 import (
-	"fmt"
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
 	"iris-ticket/backend/app/models/db"
 	"iris-ticket/backend/app/models/sys"
+	
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -24,15 +24,15 @@ func (Auth) Login(ctx iris.Context) {
 		common.ResErrSrv(ctx, err)
 		return
 	} else {
-		if UserNameErr := common.Validate.Var(aul.Username, "required,min=4,max=20"); UserNameErr != nil {
+		if UserNameErr := common.Validate.Var(aul.Username, "required,min=3,max=20"); UserNameErr != nil {
 			common.ResFail(ctx, "username format err")
 			return
-		} else if PwdErr := common.Validate.Var(aul.Password, "required,min=5,max=20"); PwdErr != nil {
+		} else if PwdErr := common.Validate.Var(aul.Password, "required,min=6,max=20"); PwdErr != nil {
 			common.ResFail(ctx, "password format err")
 		} else {
 			ctx.StatusCode(iris.StatusOK)
-			_, _, msg := CheckLogin(aul.Username, aul.Password)
-			common.ResSuccess(ctx, msg)
+			response, _, _ := CheckLogin(aul.Username, aul.Password)
+			common.ResSuccess(ctx, response)
 		}
 	}
 }
@@ -81,12 +81,7 @@ func CheckLogin(username, password string) (response sys.Token, status bool, msg
 		msg = "user is not exist"
 		return
 	} else {
-		salt, _ := bcrypt.Salt(10)
-		hash, _ := bcrypt.Hash(password, salt)
-		ok := bcrypt.Match(password, user.Password)
-		fmt.Println(password)
-		fmt.Println(hash)
-		if ok {
+		if ok := bcrypt.Match(password, user.Password);ok {
 			expireTime := time.Now().Add(time.Hour * time.Duration(config.Conf.Get("jwt.timeout").(int64))).Unix()
 			jwtSecret := config.Conf.Get("jwt.secert").(string)
 			token := jwt.New(jwt.SigningMethodHS256)
