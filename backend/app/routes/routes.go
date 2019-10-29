@@ -27,11 +27,11 @@ func Register(app *iris.Application) {
 	app.RegisterView(iris.HTML("apidoc", ".html"))
 	app.HandleDir("/apidoc", "../apidoc") // 设置静态资源
 
-	api := app.Party("/v1", crs).AllowMethods(iris.MethodOptions)
+	api := app.Party("/api", crs).AllowMethods(iris.MethodOptions)
 	//v1.Use(middleware.ServeHTTP)
 
 	{
 		users := sys.User{}
-		api.Get("/{id:uint}", users.List)
+		api.Get("/user/detail", users.Detail)
 	}
 }

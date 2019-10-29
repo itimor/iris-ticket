@@ -1,6 +1,10 @@
 package controllers
 
 import (
+	"iris-ticket/backend/app/controllers/common"
+	models "iris-ticket/backend/app/models/common"
+	"iris-ticket/backend/app/models/sys"
+
 	"github.com/kataras/iris"
 )
 
@@ -17,10 +21,17 @@ func ApiResource(status bool, objects interface{}, msg string) (apijson *ApiJson
 
 type User struct{}
 
-func (User) List(ctx iris.Context) {
-	id, _ := ctx.Params().GetUint64("id")
-	// user, _ := sys.GetUserById(id)
-
-	ctx.StatusCode(iris.StatusOK)
-	_, _ = ctx.JSON(ApiResource(true, id, "success"))
+// 详情
+func (User) Detail(ctx iris.Context) {
+	id := common.GetQueryToUint64(ctx, "id")
+	var model sys.User
+	where := sys.User{}
+	where.ID = id
+	_, err := models.First(&where, &model)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	model.Password = ""
+	common.ResSuccess(ctx, &model)
 }

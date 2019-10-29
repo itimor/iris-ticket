@@ -25,6 +25,12 @@ type ResponseModelBase struct {
 	Msg  string `json:"msg"`
 }
 
+// 响应JSON数据
+func ResJSON(ctx iris.Context, status int, v interface{}) {
+	ctx.StatusCode(status)
+	ctx.JSON(v)
+}
+
 // 响应成功
 func ResSuccess(ctx iris.Context, v interface{}) {
 	ret := ResponseModel{Code: SUCCESS_CODE, Msg: "ok", Data: v}
@@ -49,22 +55,16 @@ func ResFailCode(ctx iris.Context, msg string, code int) {
 	ResJSON(ctx, iris.StatusOK, &ret)
 }
 
-// 响应JSON数据
-func ResJSON(ctx iris.Context, status int, v interface{}) {
-	ctx.StatusCode(status)
-	ctx.JSON(v)
-}
-
 // 响应错误-服务端故障
 func ResErrSrv(ctx iris.Context, err error) {
 	ret := ResponseModelBase{Code: FAIL_CODE, Msg: "服务端故障"}
-	ResJSON(ctx, ctx.StatusOK, &ret)
+	ResJSON(ctx, iris.StatusOK, &ret)
 }
 
 // 响应错误-用户端故障
 func ResErrCli(ctx iris.Context, err error) {
 	ret := ResponseModelBase{Code: FAIL_CODE, Msg: "err"}
-	ResJSON(ctx, ctx.StatusOK, &ret)
+	ResJSON(ctx, iris.StatusOK, &ret)
 }
 
 type ResponsePageData struct {
@@ -81,7 +81,7 @@ type ResponsePage struct {
 // 响应成功-分页数据
 func ResSuccessPage(ctx iris.Context, total uint64, list interface{}) {
 	ret := ResponsePage{Code: SUCCESS_CODE, Msg: "ok", Data: ResponsePageData{Total: total, Items: list}}
-	ResJSON(ctx, ctx.StatusOK, &ret)
+	ResJSON(ctx, iris.StatusOK, &ret)
 }
 
 // 获取页码
@@ -92,7 +92,7 @@ func GetPageIndex(ctx iris.Context) uint64 {
 // 获取每页记录数
 func GetPageLimit(ctx iris.Context) uint64 {
 	limit := GetQueryToUint64(ctx, "limit", 20)
-	if limit > 500 {
+	if limit > 100 {
 		limit = 20
 	}
 	return limit
