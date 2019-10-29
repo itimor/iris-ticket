@@ -2,6 +2,7 @@ package routes
 
 import (
 	sys "iris-ticket/backend/app/controllers/sys"
+	"iris-ticket/backend/app/middleware"
 
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
@@ -29,7 +30,7 @@ func Register(app *iris.Application) {
 	app.HandleDir("/apidoc", "../apidoc") // 设置静态资源
 
 	api := app.Party("/api", crs).AllowMethods(iris.MethodOptions)
-	//api.Use(middleware.ServeHTTP)
+	api.Use(middleware.ServeHTTP)
 
 	{
 		auths := sys.Auth{}

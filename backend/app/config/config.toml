@@ -2,7 +2,7 @@
 name = 'gogobar'
 apidoc = './apidoc'
 apiurl = 'http://localhost:8000'
-ignore_urls = ["/", "/apidoc", "/v1/api/auth/login"]
+ignore_urls = ["/", "/apidoc", "/api/auth/login"]
 
 [jwt]
 timeout = 3   # token 过期时间，hour
