@@ -1,13 +1,13 @@
 package middleware
 
 import (
+	"strings"
+	"time"
+
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
 	"iris-ticket/backend/app/middleware/jwts"
 	"iris-ticket/backend/app/models/sys"
-
-	"strings"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris"

@@ -1,12 +1,12 @@
 package sys
 
 import (
+	"time"
+
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
 	"iris-ticket/backend/app/models/db"
 	"iris-ticket/backend/app/models/sys"
-	
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jameskeane/bcrypt"
@@ -80,7 +80,7 @@ func CheckLogin(username, password string) (response sys.Token, status bool, msg
 		msg = "user is not exist"
 		return
 	} else {
-		if ok := bcrypt.Match(password, user.Password);ok {
+		if ok := bcrypt.Match(password, user.Password); ok {
 			expireTime := time.Now().Add(time.Hour * time.Duration(config.Conf.Get("jwt.timeout").(int64))).Unix()
 			jwtSecret := config.Conf.Get("jwt.secert").(string)
 			token := jwt.New(jwt.SigningMethodHS256)

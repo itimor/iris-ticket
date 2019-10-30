@@ -120,7 +120,7 @@ func (m *Middleware) Serve(ctx context.Context) {
 		return
 	}
 	// If everything ok then call next.
-	ctx.Next()
+	// ctx.Next()
 }
 
 // FromAuthHeader is a "TokenExtractor" that takes a give context and extracts

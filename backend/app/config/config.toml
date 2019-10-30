@@ -5,7 +5,7 @@ apiurl = 'http://localhost:8000'
 ignore_urls = ["/", "/apidoc", "/api/auth/login"]
 
 [jwt]
-timeout = 3   # token 过期时间，hour
+timeout = 720   # token 过期时间，hour
 prefix = "Bearer"   # token 前缀
 secert = "xxoo-1234-xxoo"   # token 前缀
 
