@@ -39,6 +39,16 @@ func Register(app *iris.Application) {
 			auth.Post("/logout", auths.Logout)
 			auth.Post("/changepwd", auths.ChangePwd)
 		})
+		menus := sys.Menu{}
+		api.PartyFunc("/menu", func(menu router.Party) {
+			app.Get("/list", menus.List)
+			app.Get("/detail", menus.Detail)
+			app.Get("/allmenu", menus.AllMenu)
+			app.Get("/menubuttonlist", menus.MenuButtonList)
+			app.Post("/delete", menus.Delete)
+			app.Post("/update", menus.Update)
+			app.Post("/create", menus.Create)
+		})
 		users := sys.User{}
 		api.PartyFunc("/user", func(user router.Party) {
 			user.Get("/detail", users.Detail)
@@ -49,6 +59,17 @@ func Register(app *iris.Application) {
 			user.Post("/update", users.Update)
 			user.Post("/create", users.Create)
 			user.Post("/setrole", users.SetRole)
+		})
+		roles := sys.Role{}
+		api.PartyFunc("/role", func(role router.Party) {
+			app.Get("/list", roles.List)
+			app.Get("/detail", roles.Detail)
+			app.Get("/rolemenuidlist", roles.RoleMenuIDList)
+			app.Get("/allrole", roles.AllRole)
+			app.Post("/delete", roles.Delete)
+			app.Post("/update", roles.Update)
+			app.Post("/create", roles.Create)
+			app.Post("/setrole", roles.SetRole)
 		})
 
 	}
