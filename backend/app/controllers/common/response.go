@@ -1,8 +1,4 @@
-package response
-
-import (
-	"github.com/kataras/iris"
-)
+package common
 
 const (
 	// key定义
@@ -46,39 +42,3 @@ const (
 	// value define
 
 )
-
-// 200 define
-func Ok_(ctx iris.Context, msg string) {
-	Ok(ctx, msg, nil)
-}
-
-func Ok(ctx iris.Context, msg string, data interface{}) {
-	ctx.StatusCode(iris.StatusOK)
-	ctx.JSON(iris.Map{
-		CODE: iris.StatusOK,
-		MSG:  msg,
-		DATA: data,
-	})
-}
-
-// 401 error define
-func Unauthorized(ctx iris.Context, msg string, data interface{}) {
-	unauthorized := iris.StatusUnauthorized
-
-	ctx.StatusCode(unauthorized)
-	ctx.JSON(iris.Map{
-		CODE: unauthorized,
-		MSG:  msg,
-		DATA: data,
-	})
-}
-
-// common error define
-func Error(ctx iris.Context, status int, msg string, data interface{}) {
-	ctx.StatusCode(status)
-	ctx.JSON(iris.Map{
-		CODE: status,
-		MSG:  msg,
-		DATA: data,
-	})
-}
