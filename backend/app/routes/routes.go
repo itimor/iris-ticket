@@ -37,6 +37,7 @@ func Register(app *iris.Application) {
 		api.PartyFunc("/auth", func(auth router.Party) {
 			auth.Post("/login", auths.Login)
 			auth.Post("/logout", auths.Logout)
+			auth.Post("/changepwd", auths.ChangePwd)
 		})
 		users := sys.User{}
 		api.PartyFunc("/user", func(user router.Party) {

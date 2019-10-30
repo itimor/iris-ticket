@@ -7,6 +7,7 @@ import (
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
 	"iris-ticket/backend/app/middleware/jwts"
+	models "iris-ticket/backend/app/models/common"
 	"iris-ticket/backend/app/models/sys"
 
 	"github.com/dgrijalva/jwt-go"
@@ -51,12 +52,15 @@ func JwtHandler() *jwts.Middleware {
  */
 func AuthToken(ctx iris.Context) {
 	u := ctx.Values().Get(config.Conf.Get("jwt.secert").(string)).(*jwt.Token) //获取 token 信息
-	token := sys.GetOauthTokenByToken(u.Raw)                                   //获取 access_token 信息
-	if token.Revoked || token.ExpressIn < time.Now().Unix() {
+	var model sys.OauthToken
+	where := sys.OauthToken{}
+	where.Token = u.Raw
+	models.First(&where, &model)
+	if model.Revoked || model.ExpressIn < time.Now().Unix() {
 		common.ResFail(ctx, "Token has expired")
 		return
 	} else {
-		ctx.Values().Set("auth_user_id", token.UserId)
+		ctx.Values().Set("auth_user_id", model.UserId)
 	}
 
 	ctx.Next() // execute the "after" handler registered via `DoneGlobal`.

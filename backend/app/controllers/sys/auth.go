@@ -5,12 +5,11 @@ import (
 
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
-	"iris-ticket/backend/app/models/db"
+	models "iris-ticket/backend/app/models/common"
 	"iris-ticket/backend/app/models/sys"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jameskeane/bcrypt"
-	"github.com/kataras/golog"
 	"github.com/kataras/iris"
 )
 
@@ -31,8 +30,9 @@ func (Auth) Login(ctx iris.Context) {
 			common.ResFail(ctx, "password format err")
 		} else {
 			ctx.StatusCode(iris.StatusOK)
-			response, _, _ := CheckLogin(aul.Username, aul.Password)
-			common.ResSuccess(ctx, response)
+			if response, status, _ := CheckLogin(ctx, aul.Username, aul.Password); status {
+				common.ResSuccess(ctx, response)
+			}
 		}
 	}
 }
@@ -40,9 +40,52 @@ func (Auth) Login(ctx iris.Context) {
 // 用户登出
 func (Auth) Logout(ctx iris.Context) {
 	// 删除uid
-	uid, _ := ctx.Values().GetUint("auth_user_id")
-	UserAdminLogout(uid)
+	uid, _ := ctx.Values().GetUint64("auth_user_id")
+	where := sys.OauthToken{}
+	where.Revoked = false
+	where.UserId = uid
+	modelOld := sys.OauthToken{}
+	_, err := models.First(&where, &modelOld)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
+	modelNew := sys.OauthToken{Revoked: true}
+	err = models.Updates(&modelOld, &modelNew)
+	if err != nil {
+		common.ResErrSrv(ctx, err)
+		return
+	}
 	common.ResSuccess(ctx, uid)
+}
+
+// 用户修改密码
+func (Auth) ChangePwd(ctx iris.Context) {
+	modelNew := sys.User{}
+	if err := ctx.ReadJSON(&modelNew); err != nil {
+		ctx.StatusCode(iris.StatusInternalServerError)
+		common.ResErrSrv(ctx, err)
+		return
+	} else {
+		uid, _ := ctx.Values().GetUint64("auth_user_id")
+		where := sys.User{}
+		where.ID = uid
+		modelOld := sys.User{}
+		_, err := models.First(&where, &modelOld)
+		if err != nil {
+			common.ResErrSrv(ctx, err)
+			return
+		}
+		salt, _ := bcrypt.Salt(10)
+		hash, _ := bcrypt.Hash(modelNew.Password, salt)
+		modelNew.Password = string(hash)
+		err = models.Updates(&modelOld, &modelNew)
+		if err != nil {
+			common.ResErrSrv(ctx, err)
+			return
+		}
+		common.ResSuccess(ctx, "password change success")
+	}
 }
 
 /**
@@ -50,22 +93,16 @@ func (Auth) Logout(ctx iris.Context) {
  * @method UserAdminCheckLogin
  * @param  {[type]}  username string [description]
  */
-func UserAdminCheckLogin(username string) sys.User {
-	aul := sys.User{}
-	if err := db.DB.Where("username = ?", username).First(&aul).Error; err != nil {
-		golog.Error("UserAdminCheckLoginErr ", err)
+func UserAdminCheckLogin(ctx iris.Context, username string) (model sys.User) {
+	where := sys.User{}
+	where.Username = username
+	model = sys.User{}
+	_, err := models.First(&where, &model)
+	if err != nil {
+		common.ResFail(ctx, "操作失败")
+		return
 	}
-	return aul
-}
-
-/**
-* 用户退出登陆
-* @method UserAdminLogout
-* @param  {[type]} ids string [description]
- */
-func UserAdminLogout(uid uint) string {
-	ot := sys.UpdateOauthTokenByUserId(uid)
-	return ot.Secret
+	return
 }
 
 /**
@@ -74,9 +111,10 @@ func UserAdminLogout(uid uint) string {
  * @param  {[type]}  username string    [description]
  * @param  {[type]}  password string [description]
  */
-func CheckLogin(username, password string) (response sys.Token, status bool, msg string) {
-	user := UserAdminCheckLogin(username)
+func CheckLogin(ctx iris.Context, username, password string) (response string, status bool, msg string) {
+	user := UserAdminCheckLogin(ctx, username)
 	if user.ID == 0 {
+		status = false
 		msg = "user is not exist"
 		return
 	} else {
@@ -91,7 +129,7 @@ func CheckLogin(username, password string) (response sys.Token, status bool, msg
 			Tokenstring, err := token.SignedString([]byte(jwtSecret))
 
 			if err != nil {
-				msg = err.Error()
+				common.ResFail(ctx, err.Error())
 				return
 			}
 
@@ -102,13 +140,16 @@ func CheckLogin(username, password string) (response sys.Token, status bool, msg
 			oauthToken.Revoked = false
 			oauthToken.ExpressIn = expireTime
 			oauthToken.CreatedAt = time.Now()
-			response = oauthToken.OauthTokenCreate()
-			status = true
-			msg = "success"
-
+			err = models.Create(&oauthToken)
+			if err != nil {
+				status = false
+			} else {
+				response = Tokenstring
+				status = true
+			}
 			return
 		} else {
-			msg = "password is error"
+			common.ResFail(ctx, "密码错误")
 			return
 		}
 	}
