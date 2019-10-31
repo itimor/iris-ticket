@@ -1,7 +1,7 @@
 package routes
 
 import (
-	sys "iris-ticket/backend/app/controllers/sys"
+	"iris-ticket/backend/app/controllers/sys"
 	"iris-ticket/backend/app/middleware"
 
 	"github.com/iris-contrib/middleware/cors"
@@ -40,13 +40,13 @@ func Register(app *iris.Application) {
 		})
 		menus := sys.Menu{}
 		api.PartyFunc("/menu", func(menu router.Party) {
-			app.Get("/list", menus.List)
-			app.Get("/detail", menus.Detail)
-			app.Get("/allmenu", menus.AllMenu)
-			app.Get("/menubuttonlist", menus.MenuButtonList)
-			app.Post("/delete", menus.Delete)
-			app.Post("/update", menus.Update)
-			app.Post("/create", menus.Create)
+			menu.Get("/list", menus.List)
+			menu.Get("/detail", menus.Detail)
+			menu.Get("/allmenu", menus.AllMenu)
+			menu.Get("/menubuttonlist", menus.MenuButtonList)
+			menu.Post("/delete", menus.Delete)
+			menu.Post("/update", menus.Update)
+			menu.Post("/create", menus.Create)
 		})
 		users := sys.User{}
 		api.PartyFunc("/user", func(user router.Party) {
@@ -60,15 +60,14 @@ func Register(app *iris.Application) {
 		})
 		roles := sys.Role{}
 		api.PartyFunc("/role", func(role router.Party) {
-			app.Get("/list", roles.List)
-			app.Get("/detail", roles.Detail)
-			app.Get("/rolemenuidlist", roles.RoleMenuIDList)
-			app.Get("/allrole", roles.AllRole)
-			app.Post("/delete", roles.Delete)
-			app.Post("/update", roles.Update)
-			app.Post("/create", roles.Create)
-			app.Post("/setrole", roles.SetRole)
+			role.Get("/list", roles.List)
+			role.Get("/detail", roles.Detail)
+			role.Get("/rolemenuidlist", roles.RoleMenuIDList)
+			role.Get("/allrole", roles.AllRole)
+			role.Post("/delete", roles.Delete)
+			role.Post("/update", roles.Update)
+			role.Post("/create", roles.Create)
+			role.Post("/setrole", roles.SetRole)
 		})
-
 	}
 }
