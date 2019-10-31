@@ -289,16 +289,16 @@ func (User) Info(ctx iris.Context) {
 			InitMenu(menuModel)
 			menuModel = sys.Menu{Status: 1, ParentID: menuModel.ID, URL: "/role/setrole", Name: "分配角色菜单", Sequence: 6, MenuType: 3, Code: "RoleSetrolemenu", Icon: "", OperateType: "setrolemenu"}
 			models.Create(&menuModel)
-			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/admins", Name: "后台用户管理", Sequence: 40, MenuType: 2, Code: "Admins", Icon: "user", OperateType: "none"}
+			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/user", Name: "后台用户管理", Sequence: 40, MenuType: 2, Code: "user", Icon: "user", OperateType: "none"}
 			models.Create(&menuModel)
 			InitMenu(menuModel)
-			menuModel = sys.Menu{Status: 1, ParentID: menuModel.ID, URL: "/admins/setrole", Name: "分配角色", Sequence: 6, MenuType: 3, Code: "AdminsSetrole", Icon: "", OperateType: "setadminrole"}
+			menuModel = sys.Menu{Status: 1, ParentID: menuModel.ID, URL: "/user/setrole", Name: "分配角色", Sequence: 6, MenuType: 3, Code: "userSetrole", Icon: "", OperateType: "setadminrole"}
 			models.Create(&menuModel)
 
 			menuData, _ = getAllMenu()
 		}
 	} else {
-		menuData, err = getMenusByAdminsid(userID)
+		menuData, err = getMenusByUserid(userID)
 		if err != nil {
 			common.ResErrSrv(ctx, err)
 			return
@@ -356,9 +356,9 @@ func getSuperAdminMenu() (out []MenuModel) {
 		Children:  []MenuModel{}}
 	menuTop.Children = append(menuTop.Children, menuModel)
 	menuModel = MenuModel{
-		Path:      "/admins",
-		Component: "Admins",
-		Name:      "Admins",
+		Path:      "/user",
+		Component: "user",
+		Name:      "user",
 		Meta:      MenuMeta{Title: "用户管理", NoCache: false},
 		Children:  []MenuModel{}}
 	menuTop.Children = append(menuTop.Children, menuModel)
@@ -411,10 +411,10 @@ func setMenu(menus []sys.Menu, parentID uint64) (out []MenuModel) {
 }
 
 //查询登录用户权限菜单
-func getMenusByAdminsid(adminsid uint64) (ret []sys.Menu, err error) {
+func getMenusByUserid(userid uint64) (ret []sys.Menu, err error) {
 	menu := sys.Menu{}
 	var menus []sys.Menu
-	err = menu.GetMenuByAdminsid(adminsid, &menus)
+	err = menu.GetMenuByUserid(userid, &menus)
 	if err != nil || len(menus) == 0 {
 		return
 	}

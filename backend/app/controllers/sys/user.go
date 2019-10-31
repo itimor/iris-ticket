@@ -145,7 +145,7 @@ func (User) AdminsRoleIDList(ctx iris.Context) {
 
 // 分配用户角色权限
 func (User) SetRole(ctx iris.Context) {
-	adminsid := common.GetQueryToUint64(ctx, "adminsid")
+	userid := common.GetQueryToUint64(ctx, "userid")
 	var roleids []uint64
 	err := ctx.ReadJSON(&roleids)
 	if err != nil {
@@ -153,11 +153,11 @@ func (User) SetRole(ctx iris.Context) {
 		return
 	}
 	ar := sys.UserRole{}
-	err = ar.SetRole(adminsid, roleids)
+	err = ar.SetRole(userid, roleids)
 	if err != nil {
 		common.ResErrSrv(ctx, err)
 		return
 	}
-	// go common.CsbinAddRoleForUser(adminsid)
+	// go common.CsbinAddRoleForUser(userid)
 	common.ResSuccessMsg(ctx)
 }

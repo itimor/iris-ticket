@@ -12,8 +12,8 @@ import (
 // 用户-角色
 type UserRole struct {
 	basemodel.Model
-	UserID uint64 `gorm:"column:user_id;unique_index:uk_admins_role_admins_id;not null;"` // 管理员ID
-	RoleID uint64 `gorm:"column:role_id;unique_index:uk_admins_role_admins_id;not null;"` // 角色ID
+	UserID uint64 `gorm:"column:user_id;unique_index:uk_user_role_user_id;not null;"` // 管理员ID
+	RoleID uint64 `gorm:"column:role_id;unique_index:uk_user_role_user_id;not null;"` // 角色ID
 }
 
 // 表名
