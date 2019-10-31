@@ -28,7 +28,7 @@ type SkipperFunc func(iris.Context) bool
 // AllowPathPrefixSkipper 检查请求路径是否包含指定的前缀，如果包含则跳过
 func AllowPathPrefixSkipper(prefixes ...string) SkipperFunc {
 	return func(ctx iris.Context) bool {
-		path := ctx.Request.URL.Path
+		path := ctx.Path()
 		pathLen := len(path)
 
 		for _, p := range prefixes {
@@ -43,7 +43,7 @@ func AllowPathPrefixSkipper(prefixes ...string) SkipperFunc {
 // AllowPathPrefixNoSkipper 检查请求路径是否包含指定的前缀，如果包含则不跳过
 func AllowPathPrefixNoSkipper(prefixes ...string) SkipperFunc {
 	return func(ctx iris.Context) bool {
-		path := ctx.Request.URL.Path
+		path := ctx.Path()
 		pathLen := len(path)
 
 		for _, p := range prefixes {
@@ -58,7 +58,7 @@ func AllowPathPrefixNoSkipper(prefixes ...string) SkipperFunc {
 // AllowMethodAndPathPrefixSkipper 检查请求方法和路径是否包含指定的前缀，如果包含则跳过
 func AllowMethodAndPathPrefixSkipper(prefixes ...string) SkipperFunc {
 	return func(ctx iris.Context) bool {
-		path := JoinRouter(ctx.Request.Method, ctx.Request.URL.Path)
+		path := JoinRouter(ctx.Method(), ctx.Path())
 		pathLen := len(path)
 
 		for _, p := range prefixes {

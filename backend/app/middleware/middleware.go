@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/kataras/golog"
 	"strings"
 	"time"
+
+	"github.com/kataras/golog"
 
 	"iris-ticket/backend/app/config"
 	"iris-ticket/backend/app/controllers/common"
@@ -85,12 +86,12 @@ func AuthTokenMiddleware(ctx iris.Context) {
 	} else {
 		ctx.Values().Set("auth_user_id", model.UserId)
 	}
-    // if everything is ok, next().
-	// ctx.Next() 
+	// if everything is ok, next().
+	ctx.Next()
 }
 
 // CasbinMiddleware casbin中间件
-func CasbinMiddleware(skipper ...SkipperFunc) cxt iris.Context {
+func CasbinMiddleware(skipper ...SkipperFunc) iris.Handler {
 	return func(ctx iris.Context) {
 		if len(skipper) > 0 && skipper[0](ctx) {
 			ctx.Next()

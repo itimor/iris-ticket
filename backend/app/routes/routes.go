@@ -31,7 +31,6 @@ func Register(app *iris.Application) {
 
 	api := app.Party("/api", crs).AllowMethods(iris.MethodOptions)
 	api.Use(middleware.ServeHTTP)
-
 	{
 		auths := sys.Auth{}
 		api.PartyFunc("/auth", func(auth router.Party) {
@@ -53,7 +52,6 @@ func Register(app *iris.Application) {
 		api.PartyFunc("/user", func(user router.Party) {
 			user.Get("/detail", users.Detail)
 			user.Get("/list", users.List)
-			user.Get("/detail", users.Detail)
 			user.Get("/adminsroleidlist", users.AdminsRoleIDList)
 			user.Post("/delete", users.Delete)
 			user.Post("/update", users.Update)

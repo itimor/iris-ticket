@@ -101,7 +101,7 @@ func setRolePermission(enforcer *casbin.Enforcer, roleid uint64) {
 
 // 检查用户是否有权限
 func CsbinCheckPermission(userID, url, methodtype string) (bool, error) {
-	return AddPolicy(PrefixUserID+userID, url, methodtype)
+	return Enforcer.Enforce(PrefixUserID+userID, url, methodtype)
 }
 
 // 用户角色处理
