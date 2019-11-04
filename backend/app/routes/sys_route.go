@@ -10,12 +10,6 @@ import (
 func SysRoute(party iris.Party) {
 	api := party.Party("/api")
 	{
-		auths := sys.Auth{}
-		api.PartyFunc("/auth", func(auth router.Party) {
-			auth.Post("/login", auths.Login)
-			auth.Post("/logout", auths.Logout)
-			auth.Post("/changepwd", auths.ChangePwd)
-		})
 		menus := sys.Menu{}
 		api.PartyFunc("/menu", func(menu router.Party) {
 			menu.Get("/list", menus.List)

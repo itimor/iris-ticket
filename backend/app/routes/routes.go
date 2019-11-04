@@ -18,6 +18,7 @@ func Register(app *iris.Application) {
 	main := corsSetting(app)
 
 	// 加载路由
+	AuthRoute(main) // 认证登录
 	SysRoute(main) // 系统管理
 
 }
