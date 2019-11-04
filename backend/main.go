@@ -15,9 +15,25 @@ import (
 	"github.com/kataras/iris/middleware/recover"
 )
 
+// func main() {
+// 	flag.Parse()
+// 	app := newApp()
+
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
+
 func main() {
 	flag.Parse()
 	app := newApp()
+
+	app.RegisterView(iris.HTML("resources", ".html").Binary(static.Asset, static.AssetNames))
+	staticHandler := iris.StaticEmbeddedHandler("resources", static.Asset, static.AssetNames, false)
+	app.SPA(staticHandler).AddIndexName("index.html")
+	//app.StaticEmbedded("/static", "resources", static.Asset, static.AssetNames)
+	//app.Favicon("resources/favicon.ico")
+	//app.StaticWeb("/static", "resources/static")
 	err := app.Run(iris.Addr(":8000"), iris.WithoutServerError(iris.ErrServerClosed))
 	if err != nil {
 		panic(err)
@@ -67,7 +83,8 @@ func newApp() *iris.Application {
 	})
 
 	// 加载路由
-	routes.Register(app)
+	// routes.Register(app)
+	routes.Hub(app)
 
 	//初始化系统 账号 权限 角色
 	models.CreateSystemData(env)
