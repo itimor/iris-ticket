@@ -24,7 +24,7 @@ func SysRoute(party iris.Party) {
 		api.PartyFunc("/user", func(user router.Party) {
 			user.Get("/detail", users.Detail)
 			user.Get("/list", users.List)
-			user.Get("/userroleidlist", users.AdminsRoleIDList)
+			user.Get("/userroleidlist", users.UserRoleIDList)
 			user.Post("/delete", users.Delete)
 			user.Post("/update", users.Update)
 			user.Post("/create", users.Create)

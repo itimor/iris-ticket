@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function requestList(query) {
   return request({
-    url: '/admins/list',
+    url: '/user/list',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function requestList(query) {
 
 export function requestDetail(id) {
   return request({
-    url: '/admins/detail',
+    url: '/user/detail',
     method: 'get',
     params: { id }
   })
@@ -18,7 +18,7 @@ export function requestDetail(id) {
 
 export function requestUpdate(data) {
   return request({
-    url: '/admins/update',
+    url: '/user/update',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function requestUpdate(data) {
 
 export function requestCreate(data) {
   return request({
-    url: '/admins/create',
+    url: '/user/create',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export function requestCreate(data) {
 
 export function requestDelete(data) {
   return request({
-    url: '/admins/delete',
+    url: '/user/delete',
     method: 'post',
     data
   })
@@ -42,7 +42,7 @@ export function requestDelete(data) {
 
 export function requestAdminsRoleIDList(adminsid) {
   return request({
-    url: '/admins/adminsroleidlist',
+    url: '/user/adminsroleidlist',
     method: 'get',
     params: { adminsid }
   })
@@ -50,7 +50,7 @@ export function requestAdminsRoleIDList(adminsid) {
 
 export function requestSetRole(adminsid, data) {
   return request({
-    url: '/admins/setrole',
+    url: '/user/setrole',
     method: 'post',
     params: { adminsid },
     data

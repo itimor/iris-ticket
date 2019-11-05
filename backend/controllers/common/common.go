@@ -11,7 +11,7 @@ const (
 	TOKEN_KEY             = "X-Token"  //页面token键名
 	USER_ID_Key           = "X-USERID" //页面用户ID键名
 	USER_UUID_Key         = "X-UUID"   //页面UUID键名
-	SUPER_ADMIN_ID uint64 = 88         // 超级管理员账号ID
+	SUPER_ADMIN_ID uint64 = 54088      // 超级管理员账号ID
 )
 
 type ResponseModel struct {
@@ -91,9 +91,9 @@ func GetPageIndex(ctx iris.Context) uint64 {
 
 // 获取每页记录数
 func GetPageLimit(ctx iris.Context) uint64 {
-	limit := GetQueryToUint64(ctx, "limit", 20)
+	limit := GetQueryToUint64(ctx, "limit", 10)
 	if limit > 100 {
-		limit = 20
+		limit = 10
 	}
 	return limit
 }

@@ -1,5 +1,4 @@
 .vscode/
-vendor/
 go.sum
 *.tmp
 .idea/

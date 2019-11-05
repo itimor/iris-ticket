@@ -30,3 +30,11 @@ export function logout() {
   })
 }
 
+export function changepwd(data) {
+  return request({
+    url: '/auth/changepwd',
+    method: 'post',
+    data
+  })
+}
+

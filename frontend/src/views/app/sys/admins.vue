@@ -84,12 +84,12 @@
       <el-table-column type="selection" width="55" />
       <el-table-column label="用户名" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.user_name }}</span>
+          <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
       <el-table-column label="真实姓名" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.real_name }}</span>
+          <span>{{ scope.row.realname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="邮箱" align="center">
@@ -97,9 +97,9 @@
           <span>{{ scope.row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机" align="center">
+      <el-table-column label="头像" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.avatar }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -175,7 +175,7 @@
         label-width="80px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="用户名" prop="user_name">
+        <el-form-item label="用户名" prop="username">
           <el-input
             v-model="temp.user_name"
             :disabled="dialogStatus === 'create' ? false : true"
@@ -194,13 +194,13 @@
             maxlength="20"
           />
         </el-form-item>
-        <el-form-item label="真实姓名" prop="real_name">
+        <el-form-item label="真实姓名" prop="realname">
           <el-input v-model="temp.real_name" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="temp.email" />
         </el-form-item>
-        <el-form-item label="手机" prop="phone">
+        <el-form-item label="头像" prop="avatar">
           <el-input v-model="temp.phone" />
         </el-form-item>
         <el-form-item label="状态" prop="status">

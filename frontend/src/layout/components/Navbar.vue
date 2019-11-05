@@ -120,7 +120,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 // import LangSelect from '@/components/LangSelect'
 import Search from '@/components/HeaderSearch'
-import { requestEditPwd } from '@/api/app/sys/user'
+import { changepwd } from '@/api/user'
 
 export default {
   components: {
@@ -187,7 +187,7 @@ export default {
             return
           }
           this.loading = true
-          requestEditPwd(this.temp).then(response => {
+          changepwd(this.temp).then(response => {
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',

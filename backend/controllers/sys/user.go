@@ -20,6 +20,7 @@ func (User) List(ctx iris.Context) {
 	status := common.GetQueryToUint(ctx, "status")
 	var whereOrder []models.PageWhereOrder
 	order := "ID DESC"
+
 	if len(sort) >= 2 {
 		orderType := sort[0:1]
 		order = sort[1:len(sort)]
@@ -131,7 +132,7 @@ func (User) Delete(ctx iris.Context) {
 }
 
 // 获取用户下的角色ID列表
-func (User) AdminsRoleIDList(ctx iris.Context) {
+func (User) UserRoleIDList(ctx iris.Context) {
 	UserID := common.GetQueryToUint64(ctx, "user_id")
 	roleList := []uint64{}
 	where := sys.UserRole{UserID: UserID}
