@@ -1,16 +1,30 @@
 package routes
 
 import (
-	"iris-ticket/backend/controllers"
+	"iris-ticket/backend/config"
 	"iris-ticket/backend/middleware"
+	"os"
 
 	"github.com/iris-contrib/middleware/cors"
+	"github.com/kataras/golog"
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/core/router"
+	"github.com/kataras/iris/middleware/logger"
+	"github.com/kataras/iris/middleware/recover"
 )
 
-func Register(api *iris.Application) {
-	// allow cors
+// 所有的路由
+func Register(app *iris.Application) {
+	preSettring(app)
+	main := corsSetting(app)
+
+	// 加载路由
+	AuthRoute(main) // 认证登录
+	SysRoute(main) // 系统管理
+
+}
+
+func corsSetting(app *iris.Application) (main iris.Party) {
+
 	crs := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"}, // allows everything, use that to change the hosts.
 		AllowedMethods:   []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
@@ -19,39 +33,50 @@ func Register(api *iris.Application) {
 		AllowCredentials: true,
 	})
 
-	main := api.Party("/", crs).AllowMethods(iris.MethodOptions)
+	/* 定义路由 */
+	main = app.Party("/", crs).AllowMethods(iris.MethodOptions)
+	main.Use(middleware.ServeHTTP)
+	//main := app.Party("/")
+	//main.Use(middleware.ServeHTTP)
 
 	main.Get("/", func(ctx iris.Context) { // 首页模块
 		//_ = ctx.View("index.html")
 		ctx.HTML("<h1 style='height: 1000px;line-height: 1000px;text-align: center;'>召唤师，欢迎来到王者峡谷</h1>")
 	})
 
-	v1 := api.Party("/v1", crs).AllowMethods(iris.MethodOptions)
-	v1.Use(middleware.ServeHTTP)
-	// v1.Use(middleware.ServeHTTP, middleware.JwtHandler().Serve, middleware.AuthToken)
+	return main
+}
 
-	{
-		v1.PartyFunc("/api", func(admin router.Party) {
-			admin.PartyFunc("/auth", func(auth router.Party) {
-				auth.Post("/login", controllers.UserLogin)
-				auth.Get("/logout", controllers.UserLogout)
-				auth.Patch("/changePasswd/{id:uint}", controllers.UpdateUserPassword)
-			})
-			admin.PartyFunc("/users", func(users router.Party) {
-				users.Get("/", controllers.GetAllUsers)
-				users.Get("/{id:uint}", controllers.GetUser)
-				users.Post("/", controllers.CreateUser)
-				users.Put("/{id:uint}", controllers.UpdateUser)
-				users.Delete("/{id:uint}", controllers.DeleteUser)
-				users.Get("/profile", controllers.GetProfile)
-			})
-			admin.PartyFunc("/roles", func(roles router.Party) {
-				roles.Get("/", controllers.GetAllRoles)
-				roles.Get("/{id:uint}", controllers.GetRole)
-				roles.Post("/", controllers.CreateRole)
-				roles.Put("/{id:uint}", controllers.UpdateRole)
-				roles.Delete("/{id:uint}", controllers.DeleteRole)
-			})
-		})
+func preSettring(app *iris.Application) {
+	hostname, _ := os.Hostname()
+	if hostname == "wahaha" {
+		golog.Info("进入线上环境")
+	} else {
+		golog.Info("进入测试环境")
 	}
+
+	loglevle := config.Conf.Get("test.loglevel").(string)
+	app.Logger().SetLevel(loglevle)
+	app.Configure(iris.WithOptimizations)
+
+	app.Use(recover.New())
+	app.Use(logger.New())
+
+	// app.Logger().SetLevel("debug")
+	// app.Use(logger.New())
+	// app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
+	// 	ctx.JSON(controllers.ApiResource(false, nil, "404 Not Found"))
+	// })
+	app.OnErrorCode(iris.StatusInternalServerError, func(ctx iris.Context) {
+		ctx.WriteString("Oh my god, something went wrong, please check code or try again")
+
+	})
+
+	// ---------------------- 自定义错误处理 ------------------------
+	// app.OnErrorCode(iris.StatusNotFound, logger, func(ctx iris.Context) {
+	// 	supports.Error(ctx, iris.StatusNotFound, supports.NotFound, nil)
+	// })
+	// app.OnErrorCode(iris.StatusInternalServerError, logger, func(ctx iris.Context) {
+	// 	supports.Error(ctx, iris.StatusInternalServerError, supports.StatusInternalServerError, nil)
+	// })
 }

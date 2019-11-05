@@ -2,7 +2,6 @@ package main
 
 import (
 	"iris-ticket/backend/config"
-	"iris-ticket/backend/database"
 	"iris-ticket/backend/models"
 	"iris-ticket/backend/routes"
 
@@ -15,39 +14,25 @@ import (
 	"github.com/kataras/iris/middleware/recover"
 )
 
-// func main() {
-// 	flag.Parse()
-// 	app := newApp()
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
-
 func main() {
 	flag.Parse()
 	app := newApp()
-
-	app.RegisterView(iris.HTML("resources", ".html").Binary(static.Asset, static.AssetNames))
-	staticHandler := iris.StaticEmbeddedHandler("resources", static.Asset, static.AssetNames, false)
-	app.SPA(staticHandler).AddIndexName("index.html")
-	//app.StaticEmbedded("/static", "resources", static.Asset, static.AssetNames)
-	//app.Favicon("resources/favicon.ico")
-	//app.StaticWeb("/static", "resources/static")
 	err := app.Run(iris.Addr(":8000"), iris.WithoutServerError(iris.ErrServerClosed))
 	if err != nil {
 		panic(err)
 	}
 }
 
+func initDB() {
+	models.InitDB()
+	models.Migration()
+}
+
 func newApp() *iris.Application {
 	hostname, _ := os.Hostname()
-	var env string
 	if hostname == "wahaha" {
-		env = "prod"
 		golog.Info("进入线上环境")
 	} else {
-		env = "test"
 		golog.Info("进入测试环境")
 	}
 
@@ -71,23 +56,14 @@ func newApp() *iris.Application {
 
 	// migrate db
 	golog.Info("初始化数据库")
-	database.DB.AutoMigrate(
-		&models.User{},
-		&models.UserGroup{},
-		&models.Role{},
-		&models.OauthToken{},
-	)
-
-	iris.RegisterOnInterrupt(func() {
-		_ = database.DB.Close()
-	})
+	models.InitDB()
+	models.Migration()
 
 	// 加载路由
-	// routes.Register(app)
-	routes.Hub(app)
+	routes.Register(app)
 
 	//初始化系统 账号 权限 角色
-	models.CreateSystemData(env)
+	//models.CreateSystemData(env)
 
 	return app
 }
