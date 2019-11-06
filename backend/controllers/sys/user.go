@@ -2,6 +2,7 @@ package sys
 
 import (
 	"iris-ticket/backend/controllers/common"
+	"iris-ticket/backend/middleware/casbins"
 	models "iris-ticket/backend/models/common"
 	"iris-ticket/backend/models/sys"
 
@@ -159,6 +160,6 @@ func (User) SetRole(ctx iris.Context) {
 		common.ResErrSrv(ctx, err)
 		return
 	}
-	// go common.CsbinAddRoleForUser(userid)
+	go casbins.CsbinAddRoleForUser(userid)
 	common.ResSuccessMsg(ctx)
 }

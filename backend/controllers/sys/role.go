@@ -2,6 +2,7 @@ package sys
 
 import (
 	"iris-ticket/backend/controllers/common"
+	"iris-ticket/backend/middleware/casbins"
 	models "iris-ticket/backend/models/common"
 	"iris-ticket/backend/models/sys"
 
@@ -111,7 +112,7 @@ func (Role) Delete(ctx iris.Context) {
 		common.ResErrSrv(ctx, err)
 		return
 	}
-	// go common.CsbinDeleteRole(ids)
+	go casbins.CsbinDeleteRole(ids)
 	common.ResSuccessMsg(ctx)
 }
 
@@ -154,6 +155,6 @@ func (Role) SetRole(ctx iris.Context) {
 		common.ResErrSrv(ctx, err)
 		return
 	}
-	// go common.CsbinSetRolePermission(roleid)
+	go casbins.CsbinSetRolePermission(roleid)
 	common.ResSuccessMsg(ctx)
 }

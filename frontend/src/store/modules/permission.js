@@ -173,8 +173,10 @@ function generateRouter(item, isParent) {
 
 // componentsMap 需要在事先定义好
 export const componentsMap = {
+  // sys
   Menu: () => import('@/views/sys/menu'), // 菜单
   User: () => import('@/views/sys/user'), // 后台管理员
   Role: () => import('@/views/sys/role'), // 后台角色
   Test: () => import('@/views/sys/test') // test
+  // ticket
 }

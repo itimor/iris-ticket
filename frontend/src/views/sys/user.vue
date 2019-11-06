@@ -281,7 +281,7 @@
 <script>
 import { requestMenuButton } from '@/api/sys/menu'
 import { requestAll as requestAllRole } from '@/api/sys/role'
-import { requestList, requestDetail, requestUpdate, requestCreate, requestDelete, requestAdminsRoleIDList, requestSetRole } from '@/api/sys/user'
+import { requestList, requestDetail, requestUpdate, requestCreate, requestDelete, requestUserRoleIDList, requestSetRole } from '@/api/sys/user'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import { checkAuthAdd, checkAuthDel, checkAuthView, checkAuthUpdate, checkAuthSetadminrole } from '@/utils/permission'
@@ -353,7 +353,7 @@ export default {
       },
       multipleSelection: [],
       dialogFormVisibleSetRole: false,
-      dialogFormVisibleSetRoleTitle: '编辑角色权限',
+      dialogFormVisibleSetRoleTitle: '',
       treeProps: {
         children: 'children',
         label: 'name'
@@ -555,10 +555,10 @@ export default {
     },
     handleSetRole(row) {
       this.loading = true
-      this.temp = row
+      this.temp.id = row.id
       this.dialogFormVisibleSetRole = true
-      this.dialogFormVisibleSetRoleTitle = row.user_name + '-分配角色'
-      requestAdminsRoleIDList(this.temp.id).then(response => {
+      this.dialogFormVisibleSetRoleTitle = row.username + '-分配角色'
+      requestUserRoleIDList(this.temp.id).then(response => {
         this.$refs.tree.setCheckedKeys(response.data)
         this.loading = false
       })

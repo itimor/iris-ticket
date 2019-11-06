@@ -176,7 +176,7 @@ type UserData struct {
 	Menus        []MenuModel `json:"menus"`        // 菜单
 	Introduction string      `json:"introduction"` // 介绍
 	Avatar       string      `json:"avatar"`       // 图标
-	Name         string      `json:"name"`         // 姓名
+	Username     string      `json:"username"`     // 姓名
 }
 
 // 获取用户信息及可访问的权限菜单
@@ -188,6 +188,10 @@ func (Auth) Info(ctx iris.Context) {
 		return
 	}
 	userID := convert.ToUint64(uid)
+	where := sys.User{}
+	where.ID = userID
+	model := sys.User{}
+	models.First(&where, &model)
 	// 根据用户ID获取用户权限菜单
 	var menuData []sys.Menu
 	if userID == common.SUPER_ADMIN_ID {
@@ -198,11 +202,11 @@ func (Auth) Info(ctx iris.Context) {
 			return
 		}
 		if len(menuData) == 0 {
-			menuModelTop := sys.Menu{Status: 1, ParentID: 0, URL: "", Name: "TOP", Sequence: 1, MenuType: 1, Code: "TOP",OperateType:"none"}
+			menuModelTop := sys.Menu{Status: 1, ParentID: 0, URL: "", Name: "TOP", Sequence: 1, MenuType: 1, Code: "TOP", OperateType: "none"}
 			models.Create(&menuModelTop)
-			menuModelSys := sys.Menu{Status: 1, ParentID: menuModelTop.ID, URL: "", Name: "系统管理", Sequence: 1, MenuType: 1, Code: "Sys",Icon:"lock",OperateType:"none"}
+			menuModelSys := sys.Menu{Status: 1, ParentID: menuModelTop.ID, URL: "", Name: "系统管理", Sequence: 1, MenuType: 1, Code: "Sys", Icon: "lock", OperateType: "none"}
 			models.Create(&menuModelSys)
-			menuModel := sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/menu", Name: "菜单管理", Sequence: 20, MenuType: 2, Code: "Menu",Icon:"documentation",OperateType:"none"}
+			menuModel := sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/menu", Name: "菜单管理", Sequence: 20, MenuType: 2, Code: "Menu", Icon: "documentation", OperateType: "none"}
 			models.Create(&menuModel)
 			InitMenu(menuModel)
 			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/role", Name: "角色管理", Sequence: 30, MenuType: 2, Code: "Role", Icon: "tree", OperateType: "none"}
@@ -236,8 +240,7 @@ func (Auth) Info(ctx iris.Context) {
 	if len(menus) == 0 && userID == common.SUPER_ADMIN_ID {
 		menus = getSuperAdminMenu()
 	}
-	resData := UserData{Menus: menus, Name: "提莫大魔王"}
-	resData.Avatar = "https://apic.douyucdn.cn/upload/avanew/face/201709/04/01/95a344efd1141fd073397fa78cf952ae_big.jpg"
+	resData := UserData{Menus: menus, Username: model.Username, Avatar: model.Avatar}
 	common.ResSuccess(ctx, &resData)
 }
 

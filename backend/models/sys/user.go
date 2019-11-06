@@ -13,7 +13,7 @@ import (
 type User struct {
 	basemodel.Model
 	Username string `gorm:"column:username;size:32;unique_index:uk_user_username;not null;" json:"username" form:"username"` // 用户名
-	RealName string `gorm:"column:realname;size:32;" json:"realname" form:"realname"`                                        // 真实姓名
+	Realname string `gorm:"column:realname;size:32;" json:"realname" form:"realname"`                                        // 真实姓名
 	Password string `gorm:"column:password;type:char(32);not null;" json:"password" form:"password"`                         // 密码(sha1(md5(明文))加密)
 	Email    string `gorm:"column:email;size:64;" json:"email" form:"email"`                                                 // 邮箱
 	Avatar   string `gorm:"default:'https://apic.douyucdn.cn/upload/avanew/face/201709/04/01/95a344efd1141fd073397fa78cf952ae_big.jpg'" json:"avatar" form:"avatar"`

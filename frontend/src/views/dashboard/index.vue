@@ -3,11 +3,11 @@
     <div class=" clearfix">
       <pan-thumb :image="avatar" style="float: left">
         欢迎:
-        <span class="pan-info-roles">{{ name }}</span>
+        <span class="pan-info-roles">{{ username }}</span>
       </pan-thumb>
       <div class="info-container">
-        <span class="display_name">{{ name }}</span>
-        <span style="font-size:20px;padding-top:20px;display:inline-block;">{{ name }} 的首页</span>
+        <span class="display_name">{{ username }}</span>
+        <span style="font-size:20px;padding-top:20px;display:inline-block;">{{ username }} 的首页</span>
       </div>
     </div>
     <div>
@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'name',
+      'username',
       'avatar',
       'roles'
     ])

@@ -1,5 +1,5 @@
 <template>
   <div class="app-container">
-    test
+    这是一个测试页面
   </div>
 </template>

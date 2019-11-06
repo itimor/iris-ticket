@@ -11,7 +11,7 @@ const (
 	TOKEN_KEY             = "X-Token"  //页面token键名
 	USER_ID_Key           = "X-USERID" //页面用户ID键名
 	USER_UUID_Key         = "X-UUID"   //页面UUID键名
-	SUPER_ADMIN_ID uint64 = 54088      // 超级管理员账号ID
+	SUPER_ADMIN_ID uint64 = 1          // 超级管理员账号ID
 )
 
 type ResponseModel struct {
