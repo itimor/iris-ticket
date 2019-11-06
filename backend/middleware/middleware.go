@@ -33,8 +33,7 @@ func ServeHTTP(ctx iris.Context) {
 	AuthTokenMiddleware(ctx)
 
 	//casbin
-	// skipperCasbinUrls := config.Conf.Get("server.skipper_casbin_urls").([]interface{})
-	// CasbinMiddleware(AllowPathPrefixSkipper(skipperCasbinUrls...))
+	CasbinMiddleware(path)
 }
 
 /**
@@ -43,7 +42,6 @@ return
 	false:需要进一步验证
 */
 func checkURL(reqPath string) bool {
-	//config := iris.YAML("conf/app.yml")
 	skipperTokenUrls := config.Conf.Get("server.skipper_token_urls").([]interface{})
 	for _, v := range skipperTokenUrls {
 		if reqPath == v {
@@ -91,12 +89,19 @@ func AuthTokenMiddleware(ctx iris.Context) {
 }
 
 // CasbinMiddleware casbin中间件
-func CasbinMiddleware(skipper ...SkipperFunc) iris.Handler {
+func CasbinMiddleware(reqPath string) iris.Handler {
 	return func(ctx iris.Context) {
-		if len(skipper) > 0 && skipper[0](ctx) {
-			ctx.Next()
-			return
+		skipperCasbinUrls := config.Conf.Get("server.skipper_casbin_urls").([]interface{})
+		for _, v := range skipperCasbinUrls {
+			if reqPath == v {
+				ctx.Next()
+		        return
+			}
 		}
+		// if len(skipper) > 0 && skipper[0](ctx) {
+		// 	ctx.Next()
+		// 	return
+		// }
 		// 用户ID
 		uid, err := ctx.Values().GetUint64("auth_user_id")
 		if err != nil {

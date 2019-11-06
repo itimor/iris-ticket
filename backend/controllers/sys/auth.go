@@ -157,83 +157,6 @@ func CheckLogin(ctx iris.Context, username, password string) (response string, s
 	}
 }
 
-// 获取用户信息及可访问的权限菜单
-func (Auth) Info2(ctx iris.Context) {
-	type MenuMeta struct {
-		Title   string `json:"title"`
-		Icon    string `json:"icon"`
-		NoCache bool   `json:"noCache"`
-	}
-	type MenuModel struct {
-		Path      string      `json:"path"`
-		Component string      `json:"component"`
-		Name      string      `json:"name"`
-		Hidden    bool        `json:"hidden"`
-		Meta      MenuMeta    `json:"meta"`
-		Children  []MenuModel `json:"children"`
-	}
-	var menus []MenuModel
-	//图标
-	menu01Children01 := MenuModel{
-		Path:      "/icon/index",
-		Component: "icon_index", //@/views/tab/index  icon_index
-		Name:      "Icons",
-		Children:  []MenuModel{},
-		Meta:      MenuMeta{Title: "图标管理", Icon: "icon", NoCache: true}}
-	menu01Children0102 := MenuModel{
-		Path:      "/icon/index2",
-		Component: "icon_index", //@/views/tab/index  icon_index
-		Name:      "Icons",
-		Children:  []MenuModel{},
-		Meta:      MenuMeta{Title: "图标管理2", Icon: "icon", NoCache: true}}
-	menu01 := MenuModel{
-		Path:      "/icon",
-		Component: "Layout",
-		Name:      "icon",
-		Hidden:    false,
-		Meta:      MenuMeta{Title: "图标", Icon: "icon", NoCache: true},
-		Children:  []MenuModel{menu01Children01, menu01Children0102}}
-	menus = append(menus, menu01)
-
-	//文章
-	menu01Children01 = MenuModel{
-		Path:      "create",
-		Component: "example_create",
-		Name:      "CreateArticle",
-		Children:  []MenuModel{},
-		Meta:      MenuMeta{Title: "添加文章", Icon: "edit", NoCache: false}}
-	menu01Children02 := MenuModel{
-		Path:      "list",
-		Component: "example_list",
-		Name:      "ArticleList",
-		Children:  []MenuModel{},
-		Meta:      MenuMeta{Title: "文章列表", Icon: "list", NoCache: false}}
-	menu01Children03 := MenuModel{
-		Path:      "edit/:id",
-		Component: "example_edit",
-		Name:      "ArticleEdit",
-		Hidden:    true,
-		Children:  []MenuModel{},
-		Meta:      MenuMeta{Title: "文章编辑", Icon: "edit", NoCache: false}}
-	menu01 = MenuModel{
-		Path:      "/example",
-		Component: "Layout",
-		Name:      "Article",
-		Meta:      MenuMeta{Title: "文章", Icon: "example", NoCache: true},
-		Children:  []MenuModel{menu01Children01, menu01Children02, menu01Children03}}
-	menus = append(menus, menu01)
-	type LoginModelData struct {
-		Menus        []MenuModel `json:"menus"`
-		Roles        []string    `json:"roles22"`
-		Introduction string      `json:"introduction"`
-		Avatar       string      `json:"avatar"`
-		Name         string      `json:"name"`
-	}
-	resData := LoginModelData{Menus: menus, Roles: []string{"admin"}, Name: "Name002"}
-	resData.Avatar = "https://gocn.vip/uploads/nav_menu/12.jpg"
-	common.ResSuccess(ctx, resData)
-}
-
 type MenuMeta struct {
 	Title   string `json:"title"`   // 标题
 	Icon    string `json:"icon"`    // 图标
@@ -275,13 +198,11 @@ func (Auth) Info(ctx iris.Context) {
 			return
 		}
 		if len(menuData) == 0 {
-			menuModelTop := sys.Menu{Status: 1, ParentID: 0, URL: "", Name: "TOP", Sequence: 1, MenuType: 1, Code: "TOP", OperateType: "none"}
+			menuModelTop := sys.Menu{Status: 1, ParentID: 0, URL: "", Name: "TOP", Sequence: 1, MenuType: 1, Code: "TOP",OperateType:"none"}
 			models.Create(&menuModelTop)
-			menuModelSys := sys.Menu{Status: 1, ParentID: menuModelTop.ID, URL: "", Name: "系统管理", Sequence: 1, MenuType: 1, Code: "Sys", Icon: "lock", OperateType: "none"}
+			menuModelSys := sys.Menu{Status: 1, ParentID: menuModelTop.ID, URL: "", Name: "系统管理", Sequence: 1, MenuType: 1, Code: "Sys",Icon:"lock",OperateType:"none"}
 			models.Create(&menuModelSys)
-			menuModel := sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/icon", Name: "图标管理", Sequence: 10, MenuType: 2, Code: "Icon", Icon: "icon", OperateType: "none"}
-			models.Create(&menuModel)
-			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/menu", Name: "菜单管理", Sequence: 20, MenuType: 2, Code: "Menu", Icon: "documentation", OperateType: "none"}
+			menuModel := sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/menu", Name: "菜单管理", Sequence: 20, MenuType: 2, Code: "Menu",Icon:"documentation",OperateType:"none"}
 			models.Create(&menuModel)
 			InitMenu(menuModel)
 			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/role", Name: "角色管理", Sequence: 30, MenuType: 2, Code: "Role", Icon: "tree", OperateType: "none"}
@@ -289,7 +210,7 @@ func (Auth) Info(ctx iris.Context) {
 			InitMenu(menuModel)
 			menuModel = sys.Menu{Status: 1, ParentID: menuModel.ID, URL: "/role/setrole", Name: "分配角色菜单", Sequence: 6, MenuType: 3, Code: "RoleSetrolemenu", Icon: "", OperateType: "setrolemenu"}
 			models.Create(&menuModel)
-			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/user", Name: "后台用户管理", Sequence: 40, MenuType: 2, Code: "user", Icon: "user", OperateType: "none"}
+			menuModel = sys.Menu{Status: 1, ParentID: menuModelSys.ID, URL: "/user", Name: "用户管理", Sequence: 40, MenuType: 2, Code: "user", Icon: "user", OperateType: "none"}
 			models.Create(&menuModel)
 			InitMenu(menuModel)
 			menuModel = sys.Menu{Status: 1, ParentID: menuModel.ID, URL: "/user/setrole", Name: "分配角色", Sequence: 6, MenuType: 3, Code: "userSetrole", Icon: "", OperateType: "setadminrole"}
@@ -315,7 +236,7 @@ func (Auth) Info(ctx iris.Context) {
 	if len(menus) == 0 && userID == common.SUPER_ADMIN_ID {
 		menus = getSuperAdminMenu()
 	}
-	resData := UserData{Menus: menus, Name: "小王"}
+	resData := UserData{Menus: menus, Name: "提莫大魔王"}
 	resData.Avatar = "https://apic.douyucdn.cn/upload/avanew/face/201709/04/01/95a344efd1141fd073397fa78cf952ae_big.jpg"
 	common.ResSuccess(ctx, &resData)
 }
@@ -335,13 +256,6 @@ func getSuperAdminMenu() (out []MenuModel) {
 		Meta:      MenuMeta{Title: "系统管理", NoCache: false},
 		Children:  []MenuModel{}}
 	menuModel := MenuModel{
-		Path:      "/icon",
-		Component: "Icon",
-		Name:      "Icon",
-		Meta:      MenuMeta{Title: "图标管理", NoCache: false},
-		Children:  []MenuModel{}}
-	menuTop.Children = append(menuTop.Children, menuModel)
-	menuModel = MenuModel{
 		Path:      "/menu",
 		Component: "Menu",
 		Name:      "Menu",

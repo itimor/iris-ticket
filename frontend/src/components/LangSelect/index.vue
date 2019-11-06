@@ -1,7 +1,7 @@
 <template>
   <el-dropdown trigger="click" class="international" @command="handleSetLanguage">
     <div>
-      <svg-icon class-name="international-icon" icon-class="language" />
+      <svg-icon class-name="international-icon" icon-class="international" />
     </div>
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item :disabled="language==='zh'" command="zh">
@@ -36,3 +36,4 @@ export default {
   }
 }
 </script>
+

@@ -13,7 +13,7 @@ import (
 )
 
 // 所有的路由
-func Register(app *iris.Application) {
+func RegisterRouter(app *iris.Application) {
 	preSettring(app)
 	main := corsSetting(app)
 
@@ -36,8 +36,6 @@ func corsSetting(app *iris.Application) (main iris.Party) {
 	/* 定义路由 */
 	main = app.Party("/", crs).AllowMethods(iris.MethodOptions)
 	main.Use(middleware.ServeHTTP)
-	//main := app.Party("/")
-	//main.Use(middleware.ServeHTTP)
 
 	main.Get("/", func(ctx iris.Context) { // 首页模块
 		//_ = ctx.View("index.html")

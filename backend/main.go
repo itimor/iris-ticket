@@ -60,7 +60,7 @@ func newApp() *iris.Application {
 	models.Migration()
 
 	// 加载路由
-	routes.Register(app)
+	routes.RegisterRouter(app)
 
 	//初始化系统 账号 权限 角色
 	//models.CreateSystemData(env)

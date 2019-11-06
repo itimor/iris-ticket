@@ -199,3 +199,12 @@ code {
 .multiselect--active {
   z-index: 1000 !important;
 }
+
+.table-pagination {
+  padding: 10px 0;
+  float: right;
+  .pagination-container {
+    margin: 0;
+ padding: 10px 0!important;
+  }
+}
