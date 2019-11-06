@@ -23,7 +23,7 @@
         trigger="click"
       >
         <div class="avatar-wrapper">
-          <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar">
+          <el-avatar :src="avatar" />
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">

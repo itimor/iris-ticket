@@ -99,7 +99,7 @@
       </el-table-column>
       <el-table-column label="头像" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.avatar }}</span>
+          <el-avatar :src="scope.row.avatar" />
         </template>
       </el-table-column>
       <el-table-column
