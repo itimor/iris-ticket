@@ -21,47 +21,35 @@
         :accordion="true"
         @getValue="getSelectTreeValue($event, 1)"
       />
-      <el-select
-        v-model="listQuery.sort"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in sortOptions"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        />
-      </el-select>
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >
-        {{ "搜索" }}
-      </el-button>
-      <el-button
-        v-if="permissionList.add"
-        class="filter-item"
-        style="margin-left: 10px;"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >
-        {{ "添加" }}
-      </el-button>
-      <el-button
-        v-if="permissionList.del"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-delete"
-        @click="handleBatchDel"
-      >
-        {{ "删除" }}
-      </el-button>
+      <el-button-group>
+        <el-button
+          v-waves
+          class="filter-item"
+          type="primary"
+          icon="el-icon-search"
+          @click="handleFilter"
+        >
+          {{ "搜索" }}
+        </el-button>
+        <el-button
+          v-if="permissionList.add"
+          class="filter-item"
+          type="success"
+          icon="el-icon-edit"
+          @click="handleCreate"
+        >
+          {{ "添加" }}
+        </el-button>
+        <el-button
+          v-if="permissionList.del"
+          class="filter-item"
+          type="danger"
+          icon="el-icon-delete"
+          @click="handleBatchDel"
+        >
+          {{ "删除" }}
+        </el-button>
+      </el-button-group>
     </div>
 
     <el-table
@@ -99,38 +87,40 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button
-            v-if="permissionList.view"
-            size="mini"
-            type="success"
-            @click="handleDetail(row.id)"
-          >
-            {{ "查看" }}
-          </el-button>
-          <el-button
-            v-if="permissionList.update"
-            type="primary"
-            size="mini"
-            @click="handleUpdate(row.id)"
-          >
-            {{ "编辑" }}
-          </el-button>
-          <el-button
-            v-if="permissionList.del"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row)"
-          >
-            {{ "删除" }}
-          </el-button>
-          <el-button
-            v-if="permissionList.setrolemenu"
-            type="primary"
-            size="small"
-            @click="handleSetRole(row)"
-          >
-            {{ "编辑权限" }}
-          </el-button>
+          <el-button-group>
+            <el-button
+              v-if="permissionList.view"
+              size="small"
+              type="success"
+              @click="handleDetail(row.id)"
+            >
+              {{ "查看" }}
+            </el-button>
+            <el-button
+              v-if="permissionList.update"
+              size="small"
+              type="primary"
+              @click="handleUpdate(row.id)"
+            >
+              {{ "编辑" }}
+            </el-button>
+            <el-button
+              v-if="permissionList.del"
+              size="small"
+              type="danger"
+              @click="handleDelete(row)"
+            >
+              {{ "删除" }}
+            </el-button>
+            <el-button
+              v-if="permissionList.setrolemenu"
+              size="small"
+              type="warning"
+              @click="handleSetRole(row)"
+            >
+              {{ "编辑权限" }}
+            </el-button>
+          </el-button-group>
         </template>
       </el-table-column>
     </el-table>
@@ -292,12 +282,6 @@ export default {
         status: undefined,
         sort: '-id'
       },
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' },
-        { label: 'sequence Ascending', key: '+sequence' },
-        { label: 'sequence Descending', key: '-sequence' }
-      ],
       temp: {
         id: 0,
         memo: ''
