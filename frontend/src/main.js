@@ -20,10 +20,6 @@ import './utils/errorLog' // error log
 
 import * as filters from './filters' // global filters
 
-import { mockXHR } from '../mock' // simulation data
-
-if (process.env.NODE_ENV === 'production999') { mockXHR() }
-
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   i18n: (key, value) => i18n.t(key, value)
