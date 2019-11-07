@@ -23,7 +23,6 @@
       />
       <el-button-group>
         <el-button
-          v-waves
           class="filter-item"
           type="primary"
           icon="el-icon-search"
@@ -230,7 +229,6 @@
 <script>
 import { requestAll as requestAllMenu, requestMenuButton } from '@/api/sys/menu'
 import { requestList, requestDetail, requestUpdate, requestCreate, requestDelete, requestSetRole, requestRoleMenuIDList, requestAll } from '@/api/sys/role'
-import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import SelectTree from '@/components/TreeSelect'
 import { checkAuthAdd, checkAuthDel, checkAuthView, checkAuthUpdate, checkAuthSetrolemenu } from '@/utils/permission'
@@ -238,7 +236,6 @@ import { checkAuthAdd, checkAuthDel, checkAuthView, checkAuthUpdate, checkAuthSe
 export default {
   name: 'Role',
   components: { Pagination, SelectTree },
-  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {

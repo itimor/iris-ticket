@@ -5,6 +5,7 @@ import (
 	"iris-ticket/backend/middleware/casbins"
 	models "iris-ticket/backend/models/common"
 	"iris-ticket/backend/models/sys"
+	"iris-ticket/backend/pkg/convert"
 
 	"github.com/jameskeane/bcrypt"
 	"github.com/kataras/iris"
@@ -116,15 +117,23 @@ func (User) Create(ctx iris.Context) {
 
 // 删除数据
 func (User) Delete(ctx iris.Context) {
-	var ids []uint64
+	var ids,new_ids []uint64
 
 	err := ctx.ReadJSON(&ids)
 	if err != nil || len(ids) == 0 {
 		common.ResErrSrv(ctx, err)
 		return
 	}
+	// 判断移除 super_admin id
+	for _,i:= range ids {
+		if common.SUPER_ADMIN_ID != convert.ToUint64(i) {
+			new_ids = append(new_ids, convert.ToUint64(i))
+		}
+	}
+
 	user := sys.User{}
-	err = user.Delete(ids)
+	err = user.Delete(new_ids)
+
 	if err != nil {
 		common.ResErrSrv(ctx, err)
 		return

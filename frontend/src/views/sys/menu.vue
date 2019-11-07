@@ -38,7 +38,6 @@
       />
       <el-button-group>
         <el-button
-          v-waves
           class="filter-item"
           type="primary"
           icon="el-icon-search"
@@ -258,7 +257,6 @@
 
 <script>
 import { requestList, requestDetail, requestUpdate, requestCreate, requestAll, requestDelete, requestMenuButton } from '@/api/sys/menu'
-import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import SelectTree from '@/components/TreeSelect'
 import { checkAuthAdd, checkAuthDel, checkAuthView, checkAuthUpdate } from '@/utils/permission'
@@ -283,7 +281,6 @@ const menuOperateTypeOptions = [
 export default {
   name: 'Menu',
   components: { Pagination, SelectTree },
-  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {

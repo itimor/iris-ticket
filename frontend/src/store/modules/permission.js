@@ -177,6 +177,7 @@ export const componentsMap = {
   Menu: () => import('@/views/sys/menu'), // 菜单
   User: () => import('@/views/sys/user'), // 后台管理员
   Role: () => import('@/views/sys/role'), // 后台角色
+  Icon: () => import('@/views/svg-icons/index'), // 图标管理
   Test: () => import('@/views/sys/test') // test
   // ticket
 }

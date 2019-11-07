@@ -240,7 +240,7 @@ func (Auth) Info(ctx iris.Context) {
 	if len(menus) == 0 && userID == common.SUPER_ADMIN_ID {
 		menus = getSuperAdminMenu()
 	}
-	resData := UserData{Menus: menus, Username: model.Username, Avatar: model.Avatar}
+	resData := UserData{Menus: menus, Username: model.Realname, Avatar: model.Avatar}
 	common.ResSuccess(ctx, &resData)
 }
 

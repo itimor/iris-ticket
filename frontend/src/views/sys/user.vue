@@ -271,7 +271,6 @@
 import { requestMenuButton } from '@/api/sys/menu'
 import { requestAll as requestAllRole } from '@/api/sys/role'
 import { requestList, requestDetail, requestUpdate, requestCreate, requestDelete, requestUserRoleIDList, requestSetRole } from '@/api/sys/user'
-import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import { checkAuthAdd, checkAuthDel, checkAuthView, checkAuthUpdate, checkAuthSetadminrole } from '@/utils/permission'
 
@@ -284,7 +283,6 @@ const statusOptions = [
 export default {
   name: 'Admins',
   components: { Pagination },
-  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
